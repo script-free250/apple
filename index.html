@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apple Of Fortune</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&display=swap" rel="stylesheet">
+    <title>Apple Of Fortune Replica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        /* --- إعدادات عامة --- */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Roboto', sans-serif; /* خط مشابه للأصل */
         }
 
         body {
@@ -24,17 +25,17 @@
             overflow: hidden;
         }
 
-        /* حاوية التطبيق - تحاكي شاشة الجوال */
-        #app {
+        /* حاوية تحاكي شاشة الهاتف تماماً */
+        #app-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 414px; /* عرض آيفون قياسي */
             height: 100vh;
             position: relative;
-            background-color: #0a150f; /* لون خلفية احتياطي داكن */
-            /* ضع صورة الخلفية الخاصة بك هنا */
+            background-color: #0a150f;
+            /* هنا سيتم تحميل خلفية الغابة الخاصة بك */
             background-image: url('bg.png'); 
             background-size: cover;
-            background-position: center;
+            background-position: center bottom;
             display: flex;
             flex-direction: column;
         }
@@ -46,60 +47,72 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 15px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3); /* خلفية شفافة داكنة */
             z-index: 10;
         }
 
-        .header-left, .header-right {
+        .header-icons-left {
             display: flex;
             gap: 15px;
             color: #fff;
-            font-size: 24px;
-            opacity: 0.9;
+            font-size: 22px;
+            opacity: 0.8;
         }
 
-        .balance-container {
-            background: rgba(40, 50, 40, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* كبسولة الرصيد في المنتصف */
+        .balance-pill {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 6px 15px;
             border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-weight: bold;
             color: #fff;
-            font-size: 16px;
+            font-size: 15px;
         }
 
-        .plus-icon {
+        .plus-icon-yellow {
             color: #ffc107;
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: 900;
         }
 
+        .header-icon-right {
+            color: #fff;
+            font-size: 22px;
+            opacity: 0.8;
+        }
+
+        /* عنوان اللعبة تحت الهيدر */
         .game-title {
             text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            margin-top: 10px;
-            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            margin-top: 5px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         /* --- منطقة اللعب (الشبكة) --- */
-        .game-area {
+        .game-area-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            padding-bottom: 160px; /* مساحة للوحة التحكم الكبيرة */
+            padding: 20px 10px;
+            /* مساحة كبيرة في الأسفل للوحة التحكم */
+            padding-bottom: 220px; 
             position: relative;
         }
 
         .grid {
             display: flex;
-            flex-direction: column-reverse;
-            gap: 10px;
-            transform: scale(0.9); /* تصغير طفيف لتناسب الشاشة */
+            flex-direction: column-reverse; /* الصف الأول في الأسفل */
+            gap: 8px;
+            /* تصغير الشبكة قليلاً لتناسب الشاشة مع العناصر الجانبية */
+            transform: scale(0.92); 
         }
 
         .row {
@@ -107,44 +120,53 @@
             align-items: center;
             gap: 10px;
             position: relative;
+            transition: 0.3s;
         }
 
-        /* كبسولة المضاعفات (Odds) */
+        /* الصفوف غير النشطة تكون باهتة */
+        .row.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* كبسولة المضاعفات (على اليسار في التصميم العربي) */
         .odds-capsule {
             position: absolute;
-            right: -70px; /* للمحاذاة لليمين في RTL */
-            background: #1e3c2e;
+            left: -75px; /* إزاحة لليسار */
+            background: #0d2b22; /* لون أخضر داكن جداً */
             color: #fff;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
+            padding: 6px 0;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: bold;
-            min-width: 60px;
+            width: 65px;
             text-align: center;
-            border: 1px solid #2a503a;
+            border: 1px solid #1a3d32;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* الصف النشط */
+        /* تمييز الصف النشط */
         .row.active .odds-capsule {
-            background: #2a503a;
+            background: #1b4d3e; /* لون أفتح قليلاً */
             border-color: #4caf50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+            color: #fff;
         }
         
-        .row.active::before {
+        /* وهج خلف الصف النشط */
+        .row.active::after {
             content: '';
             position: absolute;
-            top: -5px; bottom: -5px; left: -5px; right: -5px;
-            background: rgba(76, 175, 80, 0.15);
-            border-radius: 25px;
+            top: -8px; bottom: -8px; left: -10px; right: -10px;
+            background: radial-gradient(ellipse at center, rgba(255,255,100,0.15) 0%, transparent 70%);
             z-index: 0;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+            border-radius: 20px;
         }
 
         /* --- تصميم الخلية (القاعدة الخشبية) --- */
+        /* هذا الـ CSS المعقد يرسم شكل الخشب الدائري */
         .cell {
-            width: 60px;
-            height: 60px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             position: relative;
             display: flex;
@@ -152,454 +174,484 @@
             align-items: center;
             cursor: pointer;
             z-index: 1;
-
-            /* محاكاة القاعدة الخشبية */
+            /* محاكاة ملمس الخشب والإضاءة */
             background: 
-                radial-gradient(circle at 50% 50%, transparent 50%, rgba(0,0,0,0.3) 100%), /* ظل داخلي */
-                linear-gradient(135deg, #5d4037 0%, #3e2723 100%); /* لون الخشب الأساسي */
-            border: 3px solid #2d1e17; /* حافة داكنة */
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 50%), /* لمعة علوية */
+                radial-gradient(circle at 50% 50%, #6d4c35 0%, #3e2723 80%, #2a1b15 100%); /* تدرج بني خشبي */
+            border: 2px solid #2a1b15; /* حافة داكنة */
             box-shadow: 
-                inset 0 2px 3px rgba(255,255,255,0.1), /* إضاءة علوية */
-                0 4px 8px rgba(0,0,0,0.5); /* ظل خارجي */
+                inset 0 1px 2px rgba(255,255,255,0.2), /* حافة داخلية فاتحة */
+                0 4px 8px rgba(0,0,0,0.6); /* ظل خارجي */
+            transition: transform 0.1s;
         }
         
         .cell:active { transform: scale(0.95); }
 
-        /* الصفوف غير النشطة */
-        .row.disabled .cell {
-            opacity: 0.7;
-            pointer-events: none;
+        /* تصميم القاعدة عند الفوز (خضراء) */
+        .cell.revealed.good {
+            /* تغيير الخلفية إلى الأخضر */
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
+                linear-gradient(135deg, #2e7d32 20%, #1b5e20 100%);
+            border-color: #1b5e20;
+        }
+        
+        /* إضافة زخرفة الورقة على القاعدة الخضراء */
+        .cell.revealed.good::before {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58' viewBox='0 0 100 100'%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2' d='M50 10 C 20 40, 20 60, 50 90 C 80 60, 80 40, 50 10 Z' /%3E%3C/svg%3E");
+            background-size: cover;
+            opacity: 0.5;
+            border-radius: 50%;
         }
 
         /* الصور داخل الخلية */
         .cell img {
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             object-fit: contain;
-            display: none;
+            display: none; /* مخفية افتراضياً */
             z-index: 2;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
-            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* قاعدة خضراء إضافية للتفاحة السليمة (كما في الصورة) */
-        .cell.revealed.good::after {
-            content: '';
-            position: absolute;
-            width: 85%; height: 85%;
-            background: radial-gradient(circle, #43a047 30%, #2e7d32 90%);
-            border-radius: 50%;
-            z-index: 1;
-            border: 2px solid #1b5e20;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4)); /* ظل للصورة نفسها */
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .cell.revealed img { display: block; }
 
-        @keyframes pop {
-            0% { transform: scale(0.5); opacity: 0; }
+        @keyframes popIn {
+            0% { transform: scale(0.6); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* --- لوحة التحكم السفلية (الرهان) --- */
-        .bet-controls {
+        /* --- لوحة التحكم السفلية الكبيرة --- */
+        .bet-controls-panel {
             position: absolute;
-            bottom: 50px; /* فوق الشريط السفلي */
+            bottom: 50px; /* فوق الشريط السفلي تماماً */
             left: 0;
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(to top, #1b242d, rgba(27, 36, 45, 0.9));
+            padding: 15px 20px;
+            /* خلفية داكنة متدرجة */
+            background: linear-gradient(to top, #151f28, #1b2630);
             display: flex;
             flex-direction: column;
+            gap: 12px;
+            border-radius: 20px 20px 0 0; /* زوايا علوية مستديرة */
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+        }
+
+        /* أزرار الرهان السريع الصفراء */
+        .quick-bets-row {
+            display: flex;
             gap: 10px;
         }
 
-        .quick-bets {
-            display: flex;
-            gap: 8px;
-        }
-
-        .quick-btn {
+        .quick-btn-yellow {
             flex: 1;
-            padding: 10px;
-            background: #ffc107;
+            padding: 12px 5px;
+            background: #ffc107; /* أصفر فاقع */
             border: none;
             border-radius: 8px;
-            color: #000;
+            color: #212121;
             font-weight: bold;
             font-size: 14px;
-            box-shadow: 0 3px 0 #c79100;
+            box-shadow: 0 3px 0 #c79100; /* ظل صلب للزر */
         }
-        .quick-btn:active { transform: translateY(3px); box-shadow: none; }
+        .quick-btn-yellow:active { transform: translateY(3px); box-shadow: 0 0 0 #c79100; }
 
-        .bet-input-container {
-            background: #2c3844;
-            border: 1px solid #3d4a57;
-            border-radius: 8px;
-            padding: 10px;
+        /* حاوية إدخال الرهان الرمادية */
+        .bet-input-box {
+            background: #2a343d;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            padding: 5px 15px;
+            border: 1px solid #37424b;
+        }
+
+        .bet-input-wrapper {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .bet-input {
+        .bet-input-field {
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             width: 100%;
-            text-align: left;
+            text-align: left; /* الرقم على اليسار */
             outline: none;
         }
 
-        .currency-label { color: #fff; font-weight: bold; font-size: 18px; }
+        .currency-label { color: #fff; font-weight: normal; font-size: 18px; }
 
-        .bet-limits {
-            text-align: center;
-            color: #8997a5;
-            font-size: 12px;
+        .bet-limits-text {
+            text-align: left;
+            color: #6d7a86;
+            font-size: 11px;
+            margin-top: 2px;
         }
 
-        .main-action-btn {
+        /* زر الرهان الرئيسي الكبير */
+        .main-bet-btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 20px;
             font-weight: bold;
-            color: #000;
+            color: #212121;
+            /* تدرج أصفر/برتقالي */
             background: linear-gradient(180deg, #ffca28 0%, #ff8f00 100%);
             box-shadow: 0 4px 0 #e65100;
+            cursor: pointer;
         }
-        .main-action-btn:active { transform: translateY(4px); box-shadow: none; }
+        .main-bet-btn:active { transform: translateY(4px); box-shadow: none; }
 
-        /* زر السحب (يظهر أثناء اللعب) */
-        .cashout-btn-style {
+        /* نمط زر السحب (يظهر عند الفوز) */
+        .cashout-mode {
             background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%);
             box-shadow: 0 4px 0 #2e7d32;
             color: #fff;
-            display: none;
         }
-        .cashout-btn-style:active { transform: translateY(4px); box-shadow: none; }
 
 
-        /* --- الشريط السفلي --- */
-        .bottom-bar {
+        /* --- الشريط السفلي الثابت --- */
+        .bottom-nav-bar {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 50px;
-            background: #11181f;
+            background: #0e161d; /* لون داكن جداً */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            border-top: 1px solid #2c3844;
+            padding: 0 25px;
+            border-top: 1px solid #1c252e;
         }
 
-        .bottom-item {
+        .nav-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: #fff;
             font-size: 14px;
-            opacity: 0.8;
+            font-weight: 500;
+            opacity: 0.9;
         }
+        .nav-icon { font-size: 18px; }
 
     </style>
 </head>
 <body>
 
-    <div id="app">
+    <div id="app-container">
         <header>
-            <div class="header-right">
-                <span>→</span> </div>
-            <div class="balance-container">
-                <span class="plus-icon">+</span>
-                <span id="balanceDisplay">105.00 UM</span>
+            <div class="header-icons-left">
+                <span>ⓘ</span> 
+                <span style="border: 2px dashed #fff; border-radius: 50%; padding: 0 4px; font-size: 14px;">BONUS</span>
             </div>
-            <div class="header-left">
-                <span>ⓘ</span> <span>⚙️</span>
+            
+            <div class="balance-pill">
+                <span class="plus-icon-yellow">+</span>
+                <span id="balanceDisplay">95 UM</span>
+            </div>
+            
+            <div class="header-icon-right">
+                <span>→</span>
             </div>
         </header>
 
         <div class="game-title">APPLE OF FORTUNE</div>
 
-        <div class="game-area">
+        <div class="game-area-container">
             <div class="grid" id="grid">
                 </div>
         </div>
 
-        <div class="bet-controls">
-            <div class="quick-bets" id="quickBets">
-                <button class="quick-btn" onclick="setBet('min')">أدنى</button>
-                <button class="quick-btn" onclick="setBet('half')">X/2</button>
-                <button class="quick-btn" onclick="setBet('double')">X2</button>
-                <button class="quick-btn" onclick="setBet('max')">أقصى</button>
+        <div class="bet-controls-panel" id="betControls">
+            <div class="quick-bets-row">
+                <button class="quick-btn-yellow" onclick="setBet('min')">أدنى</button>
+                <button class="quick-btn-yellow" onclick="setBet('half')">X/2</button>
+                <button class="quick-btn-yellow" onclick="setBet('double')">X2</button>
+                <button class="quick-btn-yellow" onclick="setBet('max')">أقصى</button>
             </div>
             
-            <div class="bet-input-container" id="betInputBox">
-                <input type="number" id="betAmount" class="bet-input" value="20">
-                <span class="currency-label">UM</span>
+            <div class="bet-input-box">
+                <div class="bet-input-wrapper">
+                    <input type="number" id="betInput" class="bet-input-field" value="20">
+                    <span class="currency-label">UM</span>
+                </div>
+                <div class="bet-limits-text">min 10 UM - max 47546.93 UM</div>
             </div>
-            
-            <div class="bet-limits" id="betLimits">min 10 UM - max 47546.93 UM</div>
 
-            <button id="actionBtn" class="main-action-btn" onclick="handleAction()">الرهان</button>
+            <button id="mainActionBtn" class="main-bet-btn" onclick="handleGameAction()">الرهان</button>
         </div>
 
-        <div class="bottom-bar">
-            <div class="bottom-item">
-                <span>⚡</span> بنقرة واحدة
+        <div class="bottom-nav-bar">
+            <div class="nav-item">
+                <span class="nav-icon">⚡</span> بـنـقـرة واحـدة
             </div>
-            <div class="bottom-item">
-                <span>⚙️</span> إعدادات
+            <div class="nav-item">
+                <span class="nav-icon">⚙️</span> إعـدادات
             </div>
         </div>
     </div>
 
     <script>
-        // --- إعدادات اللعبة ---
+        // --- إعدادات اللعبة (مطابقة للصور) ---
         const ROWS = 10;
         const COLS = 5;
-        // المضاعفات مطابقة للصورة
+        // قيم المضاعفات كما تظهر في الصورة
         const ODDS = [4.02, 6.71, 11.18, 27.97, 69.93, 349.68, 1748.4, 8742.0, 43710, 218550];
         const MIN_BET = 10;
         const MAX_BET = 47546.93;
 
-        // متغيرات الحالة
-        let balance = 105.00;
-        let currentBet = 20;
-        let activeRow = 0;
-        let isPlaying = false;
-        let bombsMap = []; // خريطة توزيع القنابل
+        // متغيرات النظام
+        let balance = 95.00; // الرصيد الابتدائي
+        let currentBetAmount = 20;
+        let currentRowIndex = 0;
+        let gameIsActive = false;
+        let gameBoardLogic = []; // لتخزين أماكن التفاح والقنابل
 
-        // عناصر DOM
-        const gridEl = document.getElementById('grid');
-        const actionBtn = document.getElementById('actionBtn');
-        const balanceEl = document.getElementById('balanceDisplay');
-        const betInput = document.getElementById('betAmount');
-        const quickBetsEl = document.getElementById('quickBets');
-        const betInputBoxEl = document.getElementById('betInputBox');
-        const betLimitsEl = document.getElementById('betLimits');
+        // عناصر الواجهة
+        const gridContainer = document.getElementById('grid');
+        const mainBtn = document.getElementById('mainActionBtn');
+        const balanceLabel = document.getElementById('balanceDisplay');
+        const betInputField = document.getElementById('betInput');
+        const controlsPanel = document.getElementById('betControls');
 
-        // --- دوال التهيئة والتحكم ---
+        // --- الوظائف الأساسية ---
 
-        // بناء الشبكة
-        function initGrid() {
-            gridEl.innerHTML = '';
+        // رسم الشبكة عند التحميل
+        function initializeBoard() {
+            gridContainer.innerHTML = '';
             for (let r = 0; r < ROWS; r++) {
-                const row = document.createElement('div');
-                row.className = 'row disabled';
-                row.id = `row-${r}`;
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row disabled'; // الصفوف معطلة في البداية
+                rowDiv.id = `row-${r}`;
 
-                // كبسولة المضاعف
-                const oddsCap = document.createElement('div');
-                oddsCap.className = 'odds-capsule';
-                oddsCap.innerText = 'x ' + ODDS[r];
-                row.appendChild(oddsCap);
+                // إنشاء كبسولة المضاعف على اليسار
+                const oddsDiv = document.createElement('div');
+                oddsDiv.className = 'odds-capsule';
+                oddsDiv.innerText = 'x ' + ODDS[r];
+                rowDiv.appendChild(oddsDiv);
 
-                // الخلايا
+                // إنشاء الخلايا الخمس
                 for (let c = 0; c < COLS; c++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell';
-                    cell.onclick = () => onCellClick(r, c);
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell'; // ستحصل على شكل الخشب من CSS
+                    cellDiv.onclick = () => cellClicked(r, c);
                     
-                    const img = document.createElement('img');
-                    img.id = `img-${r}-${c}`;
-                    // روابط الصور - تأكد من وجود الملفات
-                    img.src = ''; 
-                    img.alt = "تفاحة"; // نص بديل
+                    const cellImg = document.createElement('img');
+                    cellImg.id = `cell-img-${r}-${c}`;
+                    // الروابط للصور التي ستضعها
+                    cellImg.src = ''; 
                     
-                    cell.appendChild(img);
-                    row.appendChild(cell);
+                    cellDiv.appendChild(cellImg);
+                    rowDiv.appendChild(cellDiv);
                 }
-                gridEl.appendChild(row);
+                gridContainer.appendChild(rowDiv);
             }
         }
 
-        // التعامل مع زر الإجراء الرئيسي
-        function handleAction() {
-            if (!isPlaying) {
+        // الزر الرئيسي (يعمل كزر رهان أو زر سحب حسب الحالة)
+        function handleGameAction() {
+            if (!gameIsActive) {
                 startGame();
             } else {
-                cashOut();
+                cashOutWinnings();
             }
         }
 
-        // بدء اللعبة
+        // بدء جولة جديدة
         function startGame() {
-            currentBet = parseFloat(betInput.value);
-            if (isNaN(currentBet) || currentBet < MIN_BET || currentBet > MAX_BET) {
-                alert("الرجاء إدخال مبلغ رهان صحيح ضمن الحدود.");
-                return;
+            currentBetAmount = parseFloat(betInputField.value);
+            // التحقق من صحة الرهان
+            if (isNaN(currentBetAmount) || currentBetAmount < MIN_BET || currentBetAmount > MAX_BET) {
+                alert("الرهان خارج الحدود المسموحة"); return;
             }
-            if (currentBet > balance) {
-                alert("رصيدك غير كافي!");
-                return;
+            if (currentBetAmount > balance) {
+                alert("الرصيد غير كافي"); return;
             }
 
-            balance -= currentBet;
-            updateUI();
+            // خصم الرصيد
+            balance -= currentBetAmount;
+            updateBalanceUI();
             
-            isPlaying = true;
-            activeRow = 0;
-            generateBombs();
-            resetVisuals();
-            toggleBetControls(false); // إخفاء لوحة الرهان
+            gameIsActive = true;
+            currentRowIndex = 0;
+            createGameLogic(); // توزيع القنابل
+            resetBoardVisuals(); // تنظيف البورد
+            
+            // إخفاء لوحة الرهان أثناء اللعب (كما في التطبيق الأصلي)
+            controlsPanel.style.display = 'none';
 
-            activateRow(0);
+            // تفعيل الصف الأول
+            enableRow(0);
         }
 
-        // توليد القنابل (منطق الصعوبة المتزايدة)
-        function generateBombs() {
-            bombsMap = [];
+        // توزيع التفاح والقنابل (زيادة الصعوبة تدريجياً)
+        function createGameLogic() {
+            gameBoardLogic = [];
             for (let r = 0; r < ROWS; r++) {
-                let bombCount = 1;
-                if(r >= 4) bombCount = 2;
-                if(r >= 7) bombCount = 3;
-                if(r >= 9) bombCount = 4;
+                // عدد القنابل يزيد كلما صعدنا
+                let bombs = 1;
+                if(r >= 4) bombs = 2;
+                if(r >= 7) bombs = 3;
+                if(r === 9) bombs = 4;
 
-                let rowArr = Array(COLS).fill('good');
-                for(let k=0; k<bombCount; k++) {
+                let rowLogic = Array(COLS).fill('apple'); // الكل تفاح مبدئياً
+                for(let k=0; k<bombs; k++) {
                     let placed = false;
                     while(!placed) {
-                        let idx = Math.floor(Math.random() * COLS);
-                        if(rowArr[idx] === 'good') {
-                            rowArr[idx] = 'bad';
+                        let rnd = Math.floor(Math.random() * COLS);
+                        if(rowLogic[rnd] === 'apple') {
+                            rowLogic[rnd] = 'rotten';
                             placed = true;
                         }
                     }
                 }
-                bombsMap.push(rowArr);
+                gameBoardLogic.push(rowLogic);
             }
         }
 
-        // النقر على الخلية
-        function onCellClick(r, c) {
-            if (!isPlaying || r !== activeRow) return;
+        // عند الضغط على خلية
+        function cellClicked(r, c) {
+            if (!gameIsActive || r !== currentRowIndex) return;
 
-            const cell = document.getElementById(`img-${r}-${c}`).parentElement;
-            if (cell.classList.contains('revealed')) return;
+            const cell = document.getElementById(`cell-img-${r}-${c}`).parentElement;
+            if (cell.classList.contains('revealed')) return; // منع الضغط المكرر
 
-            revealCell(r, c);
+            revealResult(r, c);
 
-            if (bombsMap[r][c] === 'good') {
-                winLevel(r);
+            if (gameBoardLogic[r][c] === 'apple') {
+                handleWin(r);
             } else {
-                gameOver();
+                handleLoss();
             }
         }
 
-        // كشف محتوى الخلية
-        function revealCell(r, c) {
-            const cell = document.getElementById(`img-${r}-${c}`).parentElement;
-            const img = document.getElementById(`img-${r}-${c}`);
+        // كشف محتوى الخلية (تفاحة أو عقب)
+        function revealResult(r, c) {
+            const cell = document.getElementById(`cell-img-${r}-${c}`).parentElement;
+            const img = document.getElementById(`cell-img-${r}-${c}`);
             cell.classList.add('revealed');
 
-            if (bombsMap[r][c] === 'good') {
-                cell.classList.add('good');
-                img.src = 'apple.png'; // تأكد من وجود الصورة
-                img.onerror = () => { cell.innerHTML = '🍎'; cell.style.fontSize = '30px'; };
+            if (gameBoardLogic[r][c] === 'apple') {
+                cell.classList.add('good'); // تتحول لقاعدة خضراء
+                img.src = 'apple.png'; 
+                // في حال عدم وجود الصورة، نضع إيموجي مؤقت
+                img.onerror = () => { cell.innerHTML = '🍎'; cell.style.fontSize = '35px'; };
             } else {
-                cell.classList.add('bad');
-                img.src = 'rotten.png'; // تأكد من وجود الصورة
-                img.onerror = () => { cell.innerHTML = '🐛'; cell.style.fontSize = '30px'; };
+                cell.classList.add('bad'); // تبقى قاعدة بنية
+                img.src = 'rotten.png';
+                img.onerror = () => { cell.innerHTML = '🐛'; cell.style.fontSize = '35px'; };
             }
         }
 
-        // الفوز بالمستوى الحالي
-        function winLevel(r) {
-            const currentRowEl = document.getElementById(`row-${r}`);
-            currentRowEl.classList.remove('active');
+        // معالجة الفوز في الصف
+        function handleWin(r) {
+            const currentRow = document.getElementById(`row-${r}`);
+            currentRow.classList.remove('active'); // إزالة التمييز عن الصف الحالي
             
-            activeRow++;
-            let profit = (currentBet * ODDS[r]).toFixed(2);
+            currentRowIndex++;
+            let potentialWin = (currentBetAmount * ODDS[r]).toFixed(2);
 
-            // تحديث زر السحب
-            actionBtn.innerText = `سحب الأرباح (${profit} UM)`;
-            actionBtn.classList.add('cashout-btn-style');
+            // إظهار لوحة التحكم وتغيير الزر إلى "سحب"
+            controlsPanel.style.display = 'flex';
+            mainBtn.innerText = `سحب (${potentialWin} UM)`;
+            mainBtn.classList.add('cashout-mode'); // تغيير لون الزر للأخضر
 
-            if (activeRow >= ROWS) {
-                cashOut(); // فوز نهائي
+            if (currentRowIndex >= ROWS) {
+                cashOutWinnings(); // الوصول للقمة
             } else {
-                activateRow(activeRow);
+                enableRow(currentRowIndex); // تفعيل الصف التالي
             }
         }
 
-        // الخسارة
-        function gameOver() {
-            isPlaying = false;
-            revealAll(activeRow); // كشف باقي الصف
+        // معالجة الخسارة
+        function handleLoss() {
+            gameIsActive = false;
+            revealFullRow(currentRowIndex); // كشف باقي الصف للمستخدم
+            
             setTimeout(() => {
-                alert("حظ أوفر في المرة القادمة!");
-                resetGameUI();
-            }, 1000);
+                // إعادة تهيئة اللعبة بعد ثانية
+                resetToInitialState();
+            }, 1500);
         }
 
         // سحب الأرباح
-        function cashOut() {
-            if (!isPlaying) return;
-            let winIdx = activeRow - 1;
-            let winAmount = currentBet * ODDS[winIdx];
+        function cashOutWinnings() {
+            if (!gameIsActive) return;
+            
+            // الربح يعتمد على آخر صف تم تجاوزه بنجاح
+            let winIndex = currentRowIndex - 1;
+            let winAmount = currentBetAmount * ODDS[winIndex];
             
             balance += winAmount;
-            isPlaying = false;
-            updateUI();
+            updateBalanceUI();
+            gameIsActive = false;
             
-            alert(`مبروك! لقد ربحت ${winAmount.toFixed(2)} UM`);
-            resetGameUI();
+            alert(`مبروك! ربحت ${winAmount.toFixed(2)} UM`);
+            resetToInitialState();
         }
 
-        // --- دوال مساعدة ---
-        function activateRow(r) {
+        // --- دوال مساعدة للواجهة ---
+        function enableRow(r) {
             const row = document.getElementById(`row-${r}`);
             row.classList.remove('disabled');
             row.classList.add('active');
         }
 
-        function revealAll(r) {
+        // كشف كامل الصف عند الخسارة
+        function revealFullRow(r) {
             for(let c=0; c<COLS; c++) {
-                const cell = document.getElementById(`img-${r}-${c}`).parentElement;
-                if(!cell.classList.contains('revealed')) revealCell(r, c);
-                cell.style.opacity = '0.6';
+                const cell = document.getElementById(`cell-img-${r}-${c}`).parentElement;
+                if(!cell.classList.contains('revealed')) {
+                    revealResult(r, c);
+                    cell.style.opacity = '0.5'; // جعل الخلايا غير المختارة باهتة
+                }
             }
         }
 
-        function resetVisuals() { initGrid(); }
+        function resetBoardVisuals() { initializeBoard(); }
 
-        function resetGameUI() {
-            toggleBetControls(true);
-            actionBtn.innerText = "الرهان";
-            actionBtn.classList.remove('cashout-btn-style');
+        // العودة للحالة الأساسية (قبل الرهان)
+        function resetToInitialState() {
+            controlsPanel.style.display = 'flex';
+            mainBtn.innerText = "الرهان";
+            mainBtn.classList.remove('cashout-mode');
+            // تعطيل كل الصفوف
+            document.querySelectorAll('.row').forEach(row => {
+                row.classList.remove('active');
+                row.classList.add('disabled');
+            });
         }
 
-        function toggleBetControls(show) {
-            const displayStyle = show ? 'flex' : 'none';
-            quickBetsEl.style.display = displayStyle;
-            betInputBoxEl.style.display = displayStyle;
-            betLimitsEl.style.display = displayStyle;
+        function updateBalanceUI() {
+            balanceLabel.innerText = balance.toFixed(0) + ' UM'; // عرض بدون كسور كما في الصورة
         }
 
-        function updateUI() {
-            balanceEl.innerText = balance.toFixed(2) + ' UM';
-        }
-
-        // أزرار الرهان السريع
+        // وظائف أزرار الرهان السريع
         function setBet(type) {
-            let val = parseFloat(betInput.value) || MIN_BET;
+            let val = parseFloat(betInputField.value) || MIN_BET;
             switch(type) {
                 case 'min': val = MIN_BET; break;
                 case 'half': val = Math.max(MIN_BET, val / 2); break;
                 case 'double': val = Math.min(MAX_BET, val * 2); break;
                 case 'max': val = MAX_BET; break;
             }
-            betInput.value = val.toFixed(2);
+            betInputField.value = val.toFixed(0); // عرض رقم صحيح
         }
 
-        // التشغيل الأولي
-        initGrid();
+        // تشغيل عند البداية
+        initializeBoard();
     </script>
 </body>
 </html>
