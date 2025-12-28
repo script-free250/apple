@@ -2,257 +2,482 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apple of Fortune</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة كراش - محاكاة</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-
-        * { box-sizing: border-box; user-select: none; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; background-color: #111; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-
-        /* الحاوية الرئيسية التي تضمن تطابق الصورة مع الأزرار */
-        .game-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 500px; /* عرض أقصى يشبه الموبايل */
-            line-height: 0; /* لإزالة مسافات الصور */
+        :root {
+            --bg-color: #0f1923;
+            --panel-color: #1b2733;
+            --accent-color: #ff9800; /* اللون البرتقالي المميز */
+            --text-color: #ffffff;
+            --win-color: #4caf50;
+            --lose-color: #f44336;
         }
 
-        /* الصورة الأساسية */
-        .bg-image {
-            width: 100%;
-            height: auto;
-            display: block;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* طبقة العناصر الشفافة فوق الصورة */
-        .overlay-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            line-height: normal;
-        }
-
-        /* ============================================================
-           وضع التصحيح (Testing Mode)
-           الحدود الحمراء لتتأكد من الأماكن.
-           لحذفها لاحقاً: اجعل border: none; بدلاً من border: 1px solid red;
-           ============================================================ */
-        .debug-border {
-            border: 1px solid rgba(255, 0, 0, 0.5); /* حدود حمراء مؤقتة */
-            background-color: rgba(255, 0, 0, 0.1); /* خلفية حمراء خفيفة */
-        }
-
-        /* 1. ضبط مكان الرصيد */
-        .balance-box {
-            position: absolute;
-            top: 5.5%; left: 35%; width: 30%; height: 4%;
-            display: flex; justify-content: center; align-items: center;
-            color: #fff; font-weight: bold; font-size: 1.2rem;
-            background: #222; border-radius: 50px; z-index: 2;
-        }
-
-        /* 2. ضبط شبكة اللعب (التفاح) */
-        .grid-container {
-            position: absolute;
-            top: 17.5%; /* بداية الشبكة من الاعلى */
-            left: 17%;  /* المسافة من اليسار */
-            width: 80%; /* عرض الشبكة */
-            height: 52%; /* ارتفاع الشبكة */
-            display: flex; flex-direction: column-reverse;
-            gap: 1%;
-            z-index: 5;
-        }
-
-        .row { flex: 1; display: flex; gap: 2%; }
-        .cell {
+        /* حاوية اللعبة */
+        .game-container {
+            display: flex;
             flex: 1;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        /* لوحة التحكم الجانبية */
+        .control-panel {
+            width: 300px;
+            background-color: var(--panel-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        input[type="number"] {
+            background: #0b1219;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        /* الأزرار */
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
+            transition: 0.2s;
+            text-transform: uppercase;
+            width: 100%;
         }
-        
-        /* الأيقونات (تفاحة/دودة) */
-        .cell span { font-size: 1.5rem; display: none; filter: drop-shadow(0 2px 2px black); }
 
-        /* 3. أزرار التحكم السفلية */
-        .controls-row {
+        .btn-bet {
+            background-color: var(--win-color);
+            color: white;
+            box-shadow: 0 4px 0 #2e7d32;
+        }
+
+        .btn-bet:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #2e7d32;
+        }
+
+        .btn-cashout {
+            background-color: var(--accent-color);
+            color: #000;
+            box-shadow: 0 4px 0 #e65100;
+            display: none; /* مخفي افتراضياً */
+        }
+
+        .btn:disabled {
+            background-color: #555;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* منطقة الرسم البياني (اللعبة) */
+        .stage-container {
+            flex: 1;
+            background-color: var(--panel-color);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #333;
+        }
+
+        /* الرسم البياني */
+        canvas {
             position: absolute;
-            bottom: 21.2%; left: 3%; width: 94%; height: 5.5%;
-            display: flex; gap: 2%; z-index: 10;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
-        .ctrl-btn { flex: 1; cursor: pointer; border-radius: 5px; }
 
-        /* 4. إدخال الرهان */
-        .bet-input {
+        /* العداد الكبير في المنتصف */
+        .multiplier-display {
             position: absolute;
-            bottom: 11.5%; right: 5%; width: 35%; height: 6%;
-            background: #333; border: none; color: white;
-            font-size: 1.2rem; font-weight: bold; text-align: center;
-            border-radius: 8px; z-index: 10;
+            z-index: 2;
+            font-size: 5em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        /* 5. زر الرهان الكبير */
-        .action-btn {
-            position: absolute;
-            bottom: 11.5%; left: 5%; width: 30%; height: 6%;
-            cursor: pointer; z-index: 10; border-radius: 8px;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .action-text {
-            color: white; font-weight: bold; font-size: 1.1rem;
-            background: green; padding: 2px 10px; border-radius: 5px;
-            display: none; /* مخفي افتراضيا */
+        .crashed-text {
+            color: var(--lose-color);
         }
 
-        /* رسائل */
-        .msg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9); color: #fff; padding: 20px;
-            border: 2px solid #ffc107; border-radius: 10px; text-align: center;
-            display: none; z-index: 100; min-width: 200px;
+        /* شريط التاريخ (History) */
+        .history-bar {
+            height: 40px;
+            background-color: #0b1219;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .history-item {
+            background: #2c3e50;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .history-win { color: var(--win-color); }
+        .history-lose { color: var(--lose-color); }
+
+        /* تذييل بسيط */
+        .footer-info {
+            text-align: center;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: auto;
+        }
+
+        /* استجابة للجوال */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column-reverse;
+            }
+            .control-panel {
+                width: auto;
+            }
+            .stage-container {
+                height: 300px; /* ارتفاع ثابت للجوال */
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="game-wrapper">
-        <img src="image_3d1fdb.jpg" class="bg-image" alt="Game Background">
-
-        <div class="overlay-layer">
-            <div class="balance-box" id="balanceDisplay">105.00 UM</div>
-
-            <div class="grid-container debug-border" id="grid"></div>
-
-            <div class="controls-row">
-                <div class="ctrl-btn debug-border" onclick="setBet('min')"></div> <div class="ctrl-btn debug-border" onclick="setBet('x2')"></div>
-                <div class="ctrl-btn debug-border" onclick="setBet('div2')"></div>
-                <div class="ctrl-btn debug-border" onclick="setBet('max')"></div> </div>
-
-            <div class="action-btn debug-border" id="mainBtn" onclick="play()">
-                <span class="action-text" id="btnText">سحب</span>
-            </div>
-
-            <input type="number" class="bet-input" id="betAmount" value="20.00">
+    <div class="history-bar" id="historyBar">
         </div>
 
-        <div id="msgModal" class="msg">
-            <h3 id="msgTitle"></h3>
-            <p id="msgBody"></p>
+    <div class="game-container">
+        <div class="control-panel">
+            <div class="input-group">
+                <label>مبلغ الرهان (ج.م)</label>
+                <input type="number" id="betAmount" value="10" min="1">
+            </div>
+            
+            <div class="input-group">
+                <label>السحب التلقائي (اختياري)</label>
+                <input type="number" id="autoCashout" placeholder="مثلاً: 2.00" step="0.1">
+            </div>
+
+            <button id="betButton" class="btn btn-bet">ضع رهان</button>
+            
+            <button id="cashoutButton" class="btn btn-cashout">سحب الأرباح <br><span id="cashoutValue">0.00</span> ج.م</button>
+
+            <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 10px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>الرصيد:</span>
+                    <span style="color:var(--accent-color); font-weight:bold;"><span id="balance">1000.00</span> ج.م</span>
+                </div>
+            </div>
+
+            <div class="footer-info">
+                محاكاة Crash - تصميم مشابه لـ 1xBet
+            </div>
+        </div>
+
+        <div class="stage-container" id="stage">
+            <div class="multiplier-display" id="multiplierDisplay">1.00x</div>
+            <canvas id="gameCanvas"></canvas>
         </div>
     </div>
 
     <script>
-        // المنطق البرمجي
-        const odds = [1.23, 1.54, 1.93, 2.41, 4.02, 6.71, 11.18, 27.97, 69.93, 349.68];
-        let balance = 105.00;
-        let currentBet = 20.00;
-        let activeRow = 0;
-        let isPlaying = false;
+        // --- إعدادات اللعبة ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const multiplierDisplay = document.getElementById('multiplierDisplay');
+        const betButton = document.getElementById('betButton');
+        const cashoutButton = document.getElementById('cashoutButton');
+        const cashoutValueSpan = document.getElementById('cashoutValue');
+        const balanceSpan = document.getElementById('balance');
+        const historyBar = document.getElementById('historyBar');
+        const betInput = document.getElementById('betAmount');
+        const autoCashoutInput = document.getElementById('autoCashout');
 
-        const gridDiv = document.getElementById('grid');
-        const balDiv = document.getElementById('balanceDisplay');
-        const betInp = document.getElementById('betAmount');
-        const btnText = document.getElementById('btnText');
-        const modal = document.getElementById('msgModal');
+        // --- المتغيرات ---
+        let balance = 1000.00;
+        let currentMultiplier = 1.00;
+        let gameStatus = 'IDLE'; // IDLE, RUNNING, CRASHED
+        let crashPoint = 0;
+        let animationId;
+        let startTime;
+        let currentBet = 0;
+        let isBetPlaced = false;
+        let hasCashedOut = false;
 
-        // بناء الشبكة
-        function initGrid() {
-            gridDiv.innerHTML = '';
-            for(let i=0; i<10; i++) {
-                let row = document.createElement('div');
-                row.className = 'row';
-                row.id = `row-${i}`;
-                for(let j=0; j<5; j++) {
-                    let cell = document.createElement('div');
-                    cell.className = 'cell debug-border'; // حدود للتجربة
-                    cell.onclick = () => clickCell(i, j, cell);
-                    let sp = document.createElement('span');
-                    cell.appendChild(sp);
-                    row.appendChild(cell);
+        // --- تحميل الصور ---
+        const planeImg = new Image();
+        // ** ملاحظة: ضع رابط الصورة هنا، أو اسم الملف المحلي 'plane.png' **
+        // سأستخدم رابط لصورة طائرة كرتونية كمثال، استبدلها بصورتك
+        planeImg.src = 'https://cdn-icons-png.flaticon.com/512/7893/7893979.png'; 
+
+        // --- تهيئة الكانفاس ---
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- المنطق الأساسي ---
+
+        // 1. بدء اللعبة
+        function startGame() {
+            if (gameStatus === 'RUNNING') return;
+
+            // التأكد من الرصيد والرهان
+            const betAmount = parseFloat(betInput.value);
+            if (isNaN(betAmount) || betAmount <= 0) {
+                alert("الرجاء إدخال مبلغ رهان صحيح");
+                return;
+            }
+            if (betAmount > balance) {
+                alert("رصيدك غير كافي");
+                return;
+            }
+
+            // خصم الرصيد
+            balance -= betAmount;
+            currentBet = betAmount;
+            updateBalance();
+
+            // إعداد المتغيرات
+            isBetPlaced = true;
+            hasCashedOut = false;
+            gameStatus = 'RUNNING';
+            currentMultiplier = 1.00;
+            startTime = Date.now();
+            
+            // تحديد نقطة التحطم (خوارزمية عشوائية بسيطة تحاكي اللعبة)
+            // المعادلة: E = 100 / (100 - R) حيث R رقم عشوائي بين 0 و 99
+            // مع احتمال 1% للتحطم الفوري عند 1.00
+            const r = Math.random() * 100;
+            if (r < 3) { // 3% احتمال تحطم فوري
+                crashPoint = 1.00; 
+            } else {
+                 // معادلة لتوليد أرقام واقعية (معظمها صغير، قليل منها كبير جداً)
+                crashPoint = Math.floor(100 / (Math.random() * 100 + 1) * 100) / 100;
+                if (crashPoint < 1.01) crashPoint = 1.01;
+            }
+            
+            // تحديث واجهة المستخدم
+            betButton.style.display = 'none';
+            cashoutButton.style.display = 'block';
+            betInput.disabled = true;
+            multiplierDisplay.classList.remove('crashed-text');
+            multiplierDisplay.style.color = '#fff';
+
+            // بدء حلقة الرسم
+            loop();
+        }
+
+        // 2. حلقة اللعبة (Animation Loop)
+        function loop() {
+            if (gameStatus !== 'RUNNING') return;
+
+            const now = Date.now();
+            const elapsed = (now - startTime) / 1000; // الثواني المنقضية
+            
+            // معادلة زيادة العداد (أسي للسرعة)
+            currentMultiplier = 1.0 + Math.pow(elapsed, 2) * 0.1;
+
+            // تحديث الرقم في الشاشة
+            multiplierDisplay.innerText = currentMultiplier.toFixed(2) + 'x';
+            
+            // تحديث زر السحب
+            if (isBetPlaced && !hasCashedOut) {
+                const potentialWin = (currentBet * currentMultiplier).toFixed(2);
+                cashoutValueSpan.innerText = potentialWin;
+
+                // التحقق من السحب التلقائي
+                const auto = parseFloat(autoCashoutInput.value);
+                if (!isNaN(auto) && currentMultiplier >= auto) {
+                    cashOut();
                 }
-                gridDiv.appendChild(row);
             }
+
+            // التحقق من التحطم
+            if (currentMultiplier >= crashPoint) {
+                crash();
+                return;
+            }
+
+            // رسم المنحنى والطائرة
+            drawGame(currentMultiplier);
+
+            animationId = requestAnimationFrame(loop);
         }
 
-        function play() {
-            if(!isPlaying) {
-                // بدء اللعب
-                let val = parseFloat(betInp.value);
-                if(val > balance || val < 1) return alert('تحقق من الرصيد');
-                
-                balance -= val;
-                currentBet = val;
-                isPlaying = true;
-                activeRow = 0;
-                updateUI();
-                
-                // تنظيف الشبكة
-                document.querySelectorAll('.cell span').forEach(s => s.style.display='none');
-                
-                // تغيير الزر
-                btnText.style.display = 'block'; // إظهار كلمة "سحب"
-                
-            } else {
-                // سحب
-                cashOut();
-            }
-        }
+        // 3. الرسم على الكانفاس
+        function drawGame(multiplier) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        function clickCell(r, c, el) {
-            if(!isPlaying || r !== activeRow) return;
-
-            let span = el.querySelector('span');
-            let win = Math.random() > 0.2; // احتمال فوز
-
-            span.style.display = 'block';
-            if(win) {
-                span.innerText = '🍎';
-                activeRow++;
-                if(activeRow >= 10) cashOut(true);
-            } else {
-                span.innerText = '🐛';
-                gameOver();
-            }
-        }
-
-        function cashOut(all=false) {
-            let mult = activeRow > 0 ? odds[activeRow-1] : 0;
-            if(activeRow === 0 && !all) mult = 0;
+            // إحداثيات الرسم
+            // كلما زاد الوقت، تتحرك الطائرة لليمين وللأعلى
+            // نقوم بعمل "Scale" لتبدو الطائرة وكأنها تتحرك في الفضاء
             
-            let w = currentBet * mult;
-            balance += w;
-            endGame(`مبروك! ربحت ${w.toFixed(2)}`);
-        }
+            const w = canvas.width;
+            const h = canvas.height;
 
-        function gameOver() {
-            endGame('حظ أوفر!');
-        }
+            // رسم الشبكة الخلفية (اختياري)
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            // خطوط طولية وعرضية بسيطة
+            for(let i=0; i<w; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
+            for(let j=0; j<h; j+=50) { ctx.moveTo(0,j); ctx.lineTo(w,j); }
+            ctx.stroke();
 
-        function endGame(txt) {
-            isPlaying = false;
-            updateUI();
-            btnText.style.display = 'none'; // إخفاء كلمة سحب ليعود الزر للصورة الأصلية
+            // رسم المنحنى (Bezier Curve)
+            ctx.beginPath();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#ff9800'; // لون الخط
+            ctx.moveTo(0, h); // البداية من الأسفل اليسار
+
+            // حساب موقع الطائرة النسبي
+            // X يتحرك خطياً، Y يتحرك أسياً مع المضاعف
+            let progress = Math.min((multiplier - 1) / 5, 1); // تقريب للحركة
             
-            document.getElementById('msgTitle').innerText = txt;
-            document.getElementById('msgBody').innerText = '';
-            modal.style.display = 'block';
-            setTimeout(() => modal.style.display='none', 2000);
+            // محاكاة حركة المنحنى
+            // النقطة الحالية للطائرة
+            let px = w * 0.8; // تثبيت الطائرة عند 80% من العرض لتحريك الخلفية
+            let py = h - (h * 0.8); // تثبيت الارتفاع تقريباً
+
+            // بما أننا نريد محاكاة "كاميرا تتبع الطائرة"، سنرسم خط منحني ينتهي عند نقطة ثابتة نسبياً
+            // لكن لتبسيط الكود للمبتدئ، سنرسم منحنى Bezier بسيط
+            
+            ctx.quadraticCurveTo(w/2, h, px - 20, py + 20);
+            ctx.stroke();
+
+            // رسم الطائرة في نهاية الخط
+            if (planeImg.complete) {
+                const imgSize = 60;
+                // تدوير الطائرة قليلاً للأعلى
+                ctx.save();
+                ctx.translate(px - 20, py + 20);
+                ctx.rotate(-20 * Math.PI / 180); 
+                ctx.drawImage(planeImg, -imgSize/2, -imgSize/2, imgSize, imgSize);
+                ctx.restore();
+            }
         }
 
-        function updateUI() {
-            balDiv.innerText = balance.toFixed(2) + ' UM';
+        // 4. دالة التحطم (Crash)
+        function crash() {
+            gameStatus = 'CRASHED';
+            cancelAnimationFrame(animationId);
+            
+            // تحديث الشاشة
+            multiplierDisplay.innerText = 'CRASHED @ ' + crashPoint.toFixed(2) + 'x';
+            multiplierDisplay.classList.add('crashed-text');
+            multiplierDisplay.style.color = '#f44336';
+
+            // إعادة الأزرار
+            betButton.style.display = 'block';
+            betButton.innerText = "الرهان مرة أخرى";
+            cashoutButton.style.display = 'none';
+            betInput.disabled = false;
+
+            // إضافة للتاريخ
+            addToHistory(crashPoint, false);
+
+            isBetPlaced = false;
         }
 
-        function setBet(t) {
-            let v = parseFloat(betInp.value);
-            if(t==='min') v=10;
-            if(t==='max') v=balance;
-            if(t==='x2') v*=2;
-            if(t==='div2') v/=2;
-            betInp.value = v.toFixed(2);
+        // 5. دالة السحب (Cash Out)
+        function cashOut() {
+            if (gameStatus !== 'RUNNING' || hasCashedOut) return;
+
+            hasCashedOut = true;
+            const winAmount = currentBet * currentMultiplier;
+            balance += winAmount;
+            updateBalance();
+
+            // تغيير الزر ليدل على الفوز
+            cashoutButton.innerHTML = `تم السحب!<br> ${winAmount.toFixed(2)} ج.م`;
+            cashoutButton.style.backgroundColor = '#4caf50';
+            cashoutButton.disabled = true;
+
+            // (تستمر اللعبة في الخلفية حتى تتحطم الطائرة، لكن اللاعب خرج)
         }
 
-        initGrid();
+        // 6. دوال مساعدة
+        function updateBalance() {
+            balanceSpan.innerText = balance.toFixed(2);
+        }
+
+        function addToHistory(value, playerWon) { // playerWon هنا غير مستخدمة لأن التاريخ يعرض النتيجة العامة
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerText = value.toFixed(2) + 'x';
+            
+            // تلوين التاريخ: عادة أقل من 2x يعتبر خسارة للكثيرين (أزرق/أحمر)، وأكثر يعتبر فوز (أخضر)
+            if (value < 2.00) {
+                div.style.color = '#3498db'; // أزرق للمضاعفات الصغيرة
+            } else if (value >= 10.00) {
+                div.style.color = '#e67e22'; // ذهبي للمضاعفات الكبيرة جدا
+            } else {
+                div.style.color = '#2ecc71'; // أخضر للمتوسط
+            }
+
+            // إضافة في البداية
+            historyBar.prepend(div);
+            
+            // الاحتفاظ بآخر 20 نتيجة فقط
+            if (historyBar.children.length > 20) {
+                historyBar.removeChild(historyBar.lastChild);
+            }
+        }
+
+        // --- ربط الأحداث ---
+        betButton.addEventListener('click', startGame);
+        cashoutButton.addEventListener('click', cashOut);
+
     </script>
 </body>
 </html>
