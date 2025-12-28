@@ -3,24 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MelBet Crash Layout</title>
+    <title>MelBet Crash Simulator</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #0e1621;
-            --bg-dark: #111;
-            --bg-panel: #1b242d;
-            --bg-input: #0b1219;
-            --header-yellow: #f5a623;
-            --header-text: #1a1a1a;
-            --accent-red: #e94848;
             --accent-green: #5da034;
             --accent-orange: #ff7f00;
-            --text-white: #ffffff;
-            --text-gray: #7f8b98;
-            --border-color: #2a3544;
-            --sidebar-width: 320px;
-            --icons-bar-width: 50px;
+            --accent-red: #e94848;
         }
 
         * {
@@ -31,476 +20,246 @@
         }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-white);
             margin: 0;
             padding: 0;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
-        }
-
-        /* --- 1. Header --- */
-        header {
-            height: 85px;
+            background-color: #0e1621;
             display: flex;
-            flex-direction: column;
-            z-index: 100;
-        }
-        .top-bar {
-            height: 35px;
-            background-color: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            font-size: 11px;
-            color: #aaa;
-        }
-        .main-header {
-            height: 50px;
-            background-color: var(--header-yellow);
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            color: #000;
-            justify-content: space-between;
-        }
-        .nav-menu {
-            display: flex;
-            gap: 20px;
-            font-weight: 700;
-            font-size: 13px;
+            justify-content: center;
             align-items: center;
         }
-        .logo-box {
-            font-weight: 900; font-size: 20px; display:flex; align-items:center; gap:5px;
-        }
-        .wallet-display {
-            background: #222; color: #fff; padding: 5px 15px; border-radius: 4px; font-size: 12px;
-            display: flex; align-items: center; gap: 5px;
-        }
 
-        /* --- 2. Main Layout Container --- */
-        .main-container {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 85px);
-            overflow: hidden;
-        }
-
-        /* --- A. Left Icons Bar --- */
-        .icons-sidebar {
-            width: var(--icons-bar-width);
-            background-color: #181818;
-            border-left: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 10px;
-            gap: 15px;
-        }
-        .side-icon {
-            width: 30px; height: 30px;
-            background: #2a2a2a;
-            border-radius: 4px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; color: #fff; cursor: pointer;
-        }
-        .side-icon:hover { background: #444; }
-
-        /* --- B. Center Game Area --- */
-        .center-stage {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 5px;
-            gap: 5px;
-            background: var(--bg-body);
-        }
-
-        /* Top: Graph Canvas */
-        .game-canvas-area {
-            flex: 3; /* Takes up about 60-70% height */
-            background-color: var(--bg-panel);
-            border-radius: 5px;
+        /* الحاوية الرئيسية التي ستحمل الصورة كخلفية */
+        .game-container {
             position: relative;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            /* هنا نضع الصورة كخلفية */
+            background-image: url('image_d29779.jpg'); 
+            background-size: 100% 100%; /* تمدد الصورة لتملأ الشاشة */
+            background-repeat: no-repeat;
+            background-position: center;
         }
-        canvas { width: 100%; height: 100%; position: absolute; top:0; left:0; }
-        
+
+        /* --- 1. الطائرة (Canvas) --- */
+        /* نجعلها فوق منطقة الرسم فقط */
+        .canvas-area {
+            position: absolute;
+            top: 13%;      /* مسافة من الأعلى لتفادي الهيدر */
+            left: 0;       /* تبدأ من اليسار */
+            width: 73%;    /* العرض تقريباً ليتوقف قبل القائمة الجانبية اليمنى */
+            height: 55%;   /* الارتفاع ليتوقف قبل منطقة الأزرار والسجل */
+            z-index: 10;   /* لضمان ظهور الطائرة فوق الخلفية */
+            /* border: 1px solid red;  احذف هذا السطر، هو فقط للتجربة لتعرف الحدود */
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
         .multiplier-text {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute;
+            top: 40%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 4.5rem; font-weight: bold; color: #fff;
+            font-size: 5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
             font-family: 'Roboto', sans-serif;
-            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 15;
         }
 
-        /* Bottom: Controls & History split */
-        .bottom-split-area {
-            flex: 2; /* Takes up remaining height */
-            display: flex;
-            gap: 5px;
-            min-height: 240px; /* Fixed height constraint */
+        /* مؤقت الانتظار */
+        .loader-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center;
+            background: rgba(14, 22, 33, 0.4); /* شفافية بسيطة */
+            z-index: 20;
         }
+        .timer-big { font-size: 50px; font-weight: bold; color: #e94848; font-family: 'Roboto'; margin: 10px 0;}
+        .prog-bar { width: 150px; height: 4px; background: #000; border-radius: 2px;}
+        .prog-fill { height: 100%; background: #e94848; width: 0%; transition: width 0.1s; }
 
-        /* Bottom Left: Betting Controls (Stacked) */
-        .betting-col {
-            width: 450px; /* Fixed width for controls like image */
+
+        /* --- 2. أزرار التحكم (Controls) --- */
+        /* هذه المنطقة ستوضع في الفراغ الذي مسحته أسفل اليسار */
+        .controls-overlay {
+            position: absolute;
+            bottom: 2.5%;     /* مسافة من الأسفل */
+            left: 21%;      /* مسافة من اليسار (بعد الشريط الجانبي الصغير) */
+            width: 33%;     /* عرض المنطقة المخصصة للأزرار */
+            height: 23%;    /* ارتفاع المنطقة */
             display: flex;
             flex-direction: column;
             gap: 5px;
+            z-index: 20;
+            /* background: rgba(0, 255, 0, 0.1);  للتجربة: لون أخضر شفاف لضبط المكان */
         }
 
-        .bet-unit {
+        /* تصميم كارت الرهان الواحد */
+        .bet-row {
             flex: 1;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(27, 36, 45, 0.95); /* خلفية شبه شفافة لتغطي أي بقايا */
             border-radius: 4px;
             padding: 5px 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            border: 1px solid #2a3544;
         }
 
-        .bet-header-row {
-            display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 10px; color: #aaa;
-        }
-        .toggle-switch {
-            display: flex; align-items: center; gap: 5px; cursor: pointer;
-        }
-        .switch-track { width: 24px; height: 12px; background: #000; border-radius: 6px; position: relative; border: 1px solid #333;}
-        .switch-knob { width: 8px; height: 8px; background: #666; border-radius: 50%; position: absolute; top: 1px; left: 2px; transition: 0.2s; }
-        .toggle-switch.active .switch-track { background: var(--accent-green); }
-        .toggle-switch.active .switch-knob { left: 12px; background: #fff; }
-
-        /* The Control Interface Row */
-        .bet-controls-row {
-            display: flex;
-            height: 65px; /* Height of the orange button area */
-            gap: 8px;
-        }
-
-        .btn-place-bet {
-            width: 130px;
-            background: linear-gradient(to bottom, #ff9e2a, #ff7f00);
-            border: 1px solid #e67300;
+        /* الزر البرتقالي الكبير */
+        .btn-action {
+            width: 100px;
+            height: 100%;
             border-radius: 4px;
-            box-shadow: 0 3px 0 #cc6600;
+            border: none;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
-            text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+            font-weight: bold;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
             transition: 0.1s;
         }
-        .btn-place-bet:active { transform: translateY(2px); box-shadow: 0 1px 0 #cc6600; }
-        .btn-text-lg { font-size: 16px; font-weight: bold; }
-        .btn-text-sm { font-size: 9px; opacity: 0.9; }
-
+        .btn-orange {
+            background: linear-gradient(to bottom, #ff9e2a, #ff7f00);
+            border: 1px solid #e67300;
+            box-shadow: 0 4px 0 #cc6600;
+        }
         .btn-green {
             background: linear-gradient(to bottom, #7acc46, #5da034);
-            border-color: #4d862b; box-shadow: 0 3px 0 #3e6b22;
+            border: 1px solid #4d862b;
+            box-shadow: 0 4px 0 #3e6b22;
         }
         .btn-red {
             background: linear-gradient(to bottom, #ff6b6b, #e94848);
-            border-color: #c0392b; box-shadow: 0 3px 0 #a93226;
+            border: 1px solid #c0392b;
+            box-shadow: 0 4px 0 #a93226;
         }
+        .btn-action:active { transform: translateY(2px); box-shadow: none; }
 
-        .inputs-area {
+        /* منطقة الإدخال */
+        .inputs-group {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
         }
 
         .input-wrapper {
             display: flex;
+            height: 30px;
             background: #0b1219;
             border: 1px solid #333;
             border-radius: 3px;
-            height: 30px;
-            align-items: center;
         }
-        .num-input {
-            flex: 1; background: transparent; border: none; color: #fff; text-align: center; font-weight: bold; font-family: 'Roboto';
-        }
-        .mini-btn {
-            width: 25px; height: 100%; border: none; background: transparent; color: #aaa; cursor: pointer; font-size: 16px;
-        }
-
-        .quick-btns-grid {
+        .qty-btn { width: 30px; background: transparent; border: none; color: #fff; cursor: pointer; font-size: 18px; }
+        .main-input { flex: 1; background: transparent; border: none; color: #fff; text-align: center; font-weight: bold; font-family: 'Roboto'; font-size: 16px; }
+        
+        .quick-btns {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 columns like image */
+            grid-template-columns: repeat(4, 1fr);
             gap: 3px;
-            height: 30px;
         }
         .q-btn {
-            background: #242f3e; border: 1px solid #333; color: #fff;
-            border-radius: 2px; font-size: 10px; cursor: pointer; font-family: 'Roboto';
+            background: #242f3e; border: 1px solid #333; color: #ccc;
+            font-size: 10px; padding: 4px; border-radius: 2px; cursor: pointer;
         }
-        .q-btn:hover { background: #333; }
+        .q-btn:hover { background: #333; color: #fff; }
 
-
-        /* Bottom Right: History/Stats Panel */
-        .history-panel-col {
-            flex: 1;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        /* سويتشات التشغيل التلقائي */
+        .toggles-row {
+            display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 2px;
         }
-        .hist-header {
-            height: 30px;
-            background: linear-gradient(to right, #e94848, #ff7f00); /* Gradient like image */
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            font-size: 11px; font-weight: bold; color: #fff;
-            gap: 15px;
-        }
-        .hist-tab { opacity: 0.7; cursor: pointer; }
-        .hist-tab.active { opacity: 1; text-decoration: underline; }
-
-        .hist-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #555;
-            font-size: 12px;
-            gap: 10px;
-        }
-        .empty-icon {
-            width: 60px; height: 60px;
-            border: 2px solid #333;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px;
-        }
-
-        /* --- C. Right Sidebar (Live Bets) --- */
-        .right-sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            margin-right: 5px;
-        }
-
-        .sidebar-head-red {
-            background: #e94848;
-            color: white;
-            padding: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 6px 6px 0 0;
-            margin: 5px;
-            font-size: 11px; font-weight: bold;
-        }
-
-        .bets-table-container {
-            flex: 1;
-            overflow-y: auto;
-            margin: 0 5px 5px 5px;
-            background: #151d26;
-        }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 10px; }
-        th { color: #7f8b98; padding: 5px; border-bottom: 1px solid #333; font-weight: normal; }
-        td { color: #fff; padding: 4px; text-align: center; border-bottom: 1px solid #222; font-family: 'Roboto'; }
-        .win-row { background: rgba(93, 160, 52, 0.15); }
-        .win-txt { color: #5da034; }
-
-        /* Loader */
-        .loader-overlay {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(14,22,33,0.9);
-            z-index: 10;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .timer-big { font-size: 40px; font-weight: bold; color: #e94848; font-family: 'Roboto';}
+        .toggle-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .toggle-track { width: 20px; height: 10px; background: #000; border-radius: 5px; position: relative; }
+        .toggle-dot { width: 8px; height: 8px; background: #555; border-radius: 50%; position: absolute; top: 1px; left: 1px; transition: 0.2s;}
+        .toggle-item.active .toggle-track { background: var(--accent-green); }
+        .toggle-item.active .toggle-dot { left: 11px; background: #fff; }
 
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="top-bar">
-            <div style="display:flex; gap:10px; align-items:center;">
-                <span>07:47 / AR</span>
-                <span>⚙️</span>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button style="background:transparent; color:#aaa; border:none;">تسجيل الدخول</button>
-                <button style="background:var(--header-yellow); border:none; padding:2px 8px; border-radius:2px; font-weight:bold;">التسجيل</button>
-            </div>
-        </div>
-        <div class="main-header">
-            <div class="nav-menu">
-                <span>Fruit Cocktail 🍸</span>
-                <span>الالعاب الإلكترونية</span>
-                <span>عرض ترويجي</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <div class="wallet-display">
-                    <span style="color:#aaa;">EGP</span>
-                    <span style="font-weight:bold;">14,000.00</span>
-                    <span style="background:#f5a623; color:#000; border-radius:50%; width:15px; height:15px; text-align:center; font-size:10px; line-height:15px;">+</span>
-                </div>
-                <div class="logo-box">
-                    <span style="color:white;">MEL</span><span style="color:black;">BET</span>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_Egypt.svg" width="20">
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="main-container">
+    <div class="game-container">
         
-        <div class="icons-sidebar">
-            <div class="side-icon">⚙️</div>
-            <div class="side-icon">🎁</div>
-            <div class="side-icon">7</div>
-            <div class="side-icon">💲</div>
-        </div>
-
-        <div class="center-stage">
+        <div class="canvas-area">
+            <canvas id="gameCanvas"></canvas>
+            <div id="multiplier" class="multiplier-text">1.00x</div>
             
-            <div class="game-canvas-area">
-                <div style="position:absolute; bottom:0; width:100%; height:150px; opacity:0.1; background: url('https://i.imgur.com/JjOcaqH.png') repeat-x bottom; background-size:contain;"></div>
-                <canvas id="gameCanvas"></canvas>
-                <div id="multiplier" class="multiplier-text">1.00x</div>
-                
-                <div id="loader" class="loader-overlay">
-                    <div style="font-size:18px; color:#fff; font-weight:bold;">انتظار الجولة</div>
-                    <div id="timer" class="timer-big">5.0</div>
-                    <div style="width:100px; height:3px; background:#333; margin-top:5px;"><div id="progress" style="width:0; height:100%; background:#e94848;"></div></div>
-                </div>
-            </div>
-
-            <div class="bottom-split-area">
-                
-                <div class="betting-col">
-                    
-                    <div class="bet-unit">
-                        <div class="bet-header-row">
-                            <div class="toggle-switch" onclick="this.classList.toggle('active')">
-                                <div class="switch-track"><div class="switch-knob"></div></div>
-                                <span>تمكين التشغيل التلقائي</span>
-                            </div>
-                            <div class="toggle-switch">
-                                <div class="switch-track"><div class="switch-knob"></div></div>
-                                <span>سحب تلقائي</span>
-                            </div>
-                        </div>
-                        <div class="bet-controls-row">
-                            <button id="btn1" class="btn-place-bet" onclick="action(1)">
-                                <span class="btn-text-lg" id="lbl1">وضع الرهان</span>
-                                <span class="btn-text-sm" id="sub1">(على الجولة التالية)</span>
-                            </button>
-                            <div class="inputs-area">
-                                <div class="input-wrapper">
-                                    <button class="mini-btn" onclick="adjBet(1,-5)">-</button>
-                                    <input id="bet1" type="number" class="num-input" value="10">
-                                    <button class="mini-btn" onclick="adjBet(1,5)">+</button>
-                                </div>
-                                <div class="quick-btns-grid">
-                                    <button class="q-btn" onclick="setB(1, 10)">10</button>
-                                    <button class="q-btn" onclick="setB(1, 50)">50</button>
-                                    <button class="q-btn" onclick="setB(1, 100)">100</button>
-                                    <button class="q-btn" onclick="setB(1, 500)">500</button>
-                                    <button class="q-btn" onclick="setB(1, 1000)">1000</button>
-                                    <button class="q-btn" onclick="setB(1, 5000)">5000</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bet-unit">
-                        <div class="bet-header-row">
-                            <div class="toggle-switch">
-                                <div class="switch-track"><div class="switch-knob"></div></div>
-                                <span>تمكين التشغيل التلقائي</span>
-                            </div>
-                            <div class="toggle-switch">
-                                <div class="switch-track"><div class="switch-knob"></div></div>
-                                <span>سحب تلقائي</span>
-                            </div>
-                        </div>
-                        <div class="bet-controls-row">
-                            <button id="btn2" class="btn-place-bet" style="opacity:0.6; cursor:default;">
-                                <span class="btn-text-lg">وضع الرهان</span>
-                                <span class="btn-text-sm">(على الجولة التالية)</span>
-                            </button>
-                            <div class="inputs-area">
-                                <div class="input-wrapper">
-                                    <button class="mini-btn" onclick="adjBet(2,-5)">-</button>
-                                    <input id="bet2" type="number" class="num-input" value="20">
-                                    <button class="mini-btn" onclick="adjBet(2,5)">+</button>
-                                </div>
-                                <div class="quick-btns-grid">
-                                    <button class="q-btn" onclick="setB(2, 10)">10</button>
-                                    <button class="q-btn" onclick="setB(2, 50)">50</button>
-                                    <button class="q-btn" onclick="setB(2, 100)">100</button>
-                                    <button class="q-btn" onclick="setB(2, 500)">500</button>
-                                    <button class="q-btn" onclick="setB(2, 1000)">1000</button>
-                                    <button class="q-btn" onclick="setB(2, 5000)">5000</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="history-panel-col">
-                    <div class="hist-header">
-                        <span class="hist-tab active">CRASH</span>
-                        <span class="hist-tab">الأرباح</span>
-                        <span class="hist-tab">الفرص</span>
-                        <span class="hist-tab">الرهان</span>
-                    </div>
-                    <div class="hist-body">
-                        <div class="empty-icon">📄</div>
-                        <span>لم تقم بوضع أي رهان بعد</span>
-                    </div>
-                </div>
-
+            <div id="loader" class="loader-overlay">
+                <div style="color:#fff; font-weight:bold;">انتظار الجولة</div>
+                <div id="timer" class="timer-big">5.0</div>
+                <div class="prog-bar"><div id="progress" class="prog-fill"></div></div>
             </div>
         </div>
 
-        <div class="right-sidebar">
-            <div class="sidebar-head-red">
-                <div>
-                    <div>عدد الرهانات</div>
-                    <div style="font-size:10px;">EGP <span id="totalPool">34550.32</span></div>
+        <div class="controls-overlay">
+            
+            <div class="bet-row">
+                <button id="btn1" class="btn-action btn-orange" onclick="action(1)">
+                    <span style="font-size:14px" id="lbl1">رهان</span>
+                    <span style="font-size:9px; opacity:0.8" id="sub1">التالية</span>
+                </button>
+                <div class="inputs-group">
+                    <div class="toggles-row">
+                        <div class="toggle-item" onclick="this.classList.toggle('active')">
+                            <div class="toggle-track"><div class="toggle-dot"></div></div> تلقائي
+                        </div>
+                        <div class="toggle-item">
+                            <div class="toggle-track"><div class="toggle-dot"></div></div> سحب
+                        </div>
+                    </div>
+                    <div class="input-wrapper">
+                        <button class="qty-btn" onclick="adjBet(1, -5)">-</button>
+                        <input id="bet1" type="number" class="main-input" value="10">
+                        <button class="qty-btn" onclick="adjBet(1, 5)">+</button>
+                    </div>
+                    <div class="quick-btns">
+                        <button class="q-btn" onclick="setB(1, 10)">10</button>
+                        <button class="q-btn" onclick="setB(1, 50)">50</button>
+                        <button class="q-btn" onclick="setB(1, 100)">100</button>
+                        <button class="q-btn" onclick="setB(1, 500)">500</button>
+                    </div>
                 </div>
-                <div>👤 <span id="totalUsers">632</span></div>
             </div>
-            <div class="bets-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="text-align:right; width:35%;">اسم المستخدم</th>
-                            <th>الفرض</th>
-                            <th>الرهان</th>
-                            <th>الأرباح</th>
-                        </tr>
-                    </thead>
-                    <tbody id="betsTable">
-                        </tbody>
-                </table>
+
+            <div class="bet-row">
+                <button id="btn2" class="btn-action btn-orange" style="opacity:0.7; cursor:default;">
+                    <span style="font-size:14px">رهان</span>
+                    <span style="font-size:9px; opacity:0.8">التالية</span>
+                </button>
+                <div class="inputs-group">
+                    <div class="toggles-row">
+                        <div class="toggle-item">
+                            <div class="toggle-track"><div class="toggle-dot"></div></div> تلقائي
+                        </div>
+                        <div class="toggle-item">
+                            <div class="toggle-track"><div class="toggle-dot"></div></div> سحب
+                        </div>
+                    </div>
+                    <div class="input-wrapper">
+                        <button class="qty-btn" onclick="adjBet(2, -5)">-</button>
+                        <input id="bet2" type="number" class="main-input" value="20">
+                        <button class="qty-btn" onclick="adjBet(2, 5)">+</button>
+                    </div>
+                    <div class="quick-btns">
+                        <button class="q-btn" onclick="setB(2, 10)">10</button>
+                        <button class="q-btn" onclick="setB(2, 50)">50</button>
+                        <button class="q-btn" onclick="setB(2, 100)">100</button>
+                        <button class="q-btn" onclick="setB(2, 500)">500</button>
+                    </div>
+                </div>
             </div>
+
         </div>
 
     </div>
@@ -512,11 +271,17 @@
         const loader = document.getElementById('loader');
         const timerEl = document.getElementById('timer');
         const progEl = document.getElementById('progress');
+        
+        // Buttons
         const btn1 = document.getElementById('btn1');
         const lbl1 = document.getElementById('lbl1');
         const sub1 = document.getElementById('sub1');
-        const table = document.getElementById('betsTable');
 
+        // صورة الطائرة
+        const planeImg = new Image();
+        planeImg.src = 'https://cdn-icons-png.flaticon.com/512/2213/2213075.png'; 
+
+        // المتغيرات
         let state = 'IDLE';
         let mult = 1.00;
         let t = 0;
@@ -525,36 +290,34 @@
         let isBetPlaced = false;
         let inRound = false;
 
-        // Plane Icon
-        const planeImg = new Image();
-        planeImg.src = 'https://cdn-icons-png.flaticon.com/512/2213/2213075.png';
-
+        // ضبط حجم الكانفاس ليناسب الحاوية
         function resize() {
-            canvas.width = canvas.parentElement.offsetWidth;
-            canvas.height = canvas.parentElement.offsetHeight;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
         }
         window.addEventListener('resize', resize);
-        resize();
+        // استدعاء أولي بعد تحميل الصفحة بقليل لضمان الأبعاد
+        setTimeout(resize, 100);
 
         function startCount() {
             state = 'COUNT';
             loader.style.display = 'flex';
             multEl.style.display = 'none';
-            generateFakeData();
 
+            // حالة الزر
             if(isBetPlaced) {
-                btn1.className = "btn-place-bet btn-red";
+                btn1.className = "btn-action btn-red";
                 lbl1.innerText = "إلغاء";
-                sub1.innerText = "انتظار الجولة";
+                sub1.innerText = "انتظار";
             } else {
                 resetBtn();
             }
 
             let sec = 5.0;
-            const intv = setInterval(()=>{
+            const intv = setInterval(() => {
                 sec -= 0.1;
                 timerEl.innerText = Math.abs(sec).toFixed(1);
-                progEl.style.width = ((5.0-sec)/5.0)*100 + "%";
+                progEl.style.width = ((5.0 - sec)/5.0)*100 + "%";
                 if(sec <= 0) {
                     clearInterval(intv);
                     loader.style.display = 'none';
@@ -566,38 +329,37 @@
         function startFly() {
             state = 'FLY';
             multEl.style.display = 'block';
-            multEl.innerHTML = "1.00x";
-            multEl.style.color = "#fff";
-            t = 0;
+            multEl.innerText = "1.00x";
+            t = 0; 
             mult = 1.00;
-            crashPoint = (Math.random()*4)+1.1;
-            if(Math.random()>0.8) crashPoint = Math.random()*10;
+            crashPoint = (Math.random() * 4) + 1.1; 
+            if(Math.random() > 0.7) crashPoint = Math.random() * 10;
 
             if(isBetPlaced) {
                 inRound = true;
                 isBetPlaced = false;
-                btn1.className = "btn-place-bet btn-green";
+                btn1.className = "btn-action btn-green";
                 lbl1.innerText = "سحب";
                 sub1.innerText = document.getElementById('bet1').value + " EGP";
             } else {
                 btn1.style.opacity = 0.5;
-                lbl1.innerText = "انتظر";
-                sub1.innerText = "الجولة جارية";
-                btn1.disabled = true;
                 btn1.style.cursor = "default";
+                lbl1.innerText = "جاري";
+                sub1.innerText = "الانتظار";
             }
+            
             loop();
         }
 
         function loop() {
             if(state !== 'FLY') return;
-            t += 0.016;
+
+            t += 0.015;
             mult = 1.0 + (t*t*0.1);
             multEl.innerText = mult.toFixed(2) + "x";
 
             if(inRound) {
-                let w = (document.getElementById('bet1').value * mult).toFixed(2);
-                sub1.innerText = w + " EGP";
+                sub1.innerText = (document.getElementById('bet1').value * mult).toFixed(2);
             }
 
             draw();
@@ -607,46 +369,39 @@
         }
 
         function draw() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
+            // مسح الكانفاس بالكامل ليبقى شفافاً
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
             const w = canvas.width;
             const h = canvas.height;
 
-            // Grid
-            ctx.strokeStyle = "rgba(255,255,255,0.05)";
-            ctx.beginPath();
-            for(let i=0; i<w; i+=80) {ctx.moveTo(i,0); ctx.lineTo(i,h);}
-            for(let j=0; j<h; j+=80) {ctx.moveTo(0,j); ctx.lineTo(w,j);}
-            ctx.stroke();
+            // حساب مسار الطائرة
+            let progress = Math.min(t / 6, 1);
+            let sx = 0, sy = h; // نقطة البداية (أسفل اليسار)
+            let ex = w * 0.9, ey = h * 0.1; // نقطة النهاية (أعلى اليمين)
+            let cpx = w * 0.5, cpy = h; // نقطة التحكم للانحناء
 
-            // Curve
-            let progress = Math.min(t/6, 1);
-            let sx = 0, sy = h;
-            let ex = w*0.8, ey = h*0.2;
-            let cpx = w*0.5, cpy = h;
-            
+            // معادلة بيزير
             let curX = (1-progress)*(1-progress)*sx + 2*(1-progress)*progress*cpx + progress*progress*ex;
             let curY = (1-progress)*(1-progress)*sy + 2*(1-progress)*progress*cpy + progress*progress*ey;
 
+            // رسم الخط فقط (بدون تعبئة خلفية لكي تظهر الجبال الأصلية)
             ctx.beginPath();
             ctx.moveTo(sx, sy);
             ctx.quadraticCurveTo(sx + (cpx-sx)*progress, sy + (cpy-sy)*progress, curX, curY);
             ctx.strokeStyle = "#f5a623";
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 5;
             ctx.lineCap = "round";
+            ctx.shadowColor = "#f5a623";
+            ctx.shadowBlur = 15;
             ctx.stroke();
 
-            // Fill
-            ctx.lineTo(curX, h);
-            ctx.lineTo(sx, h);
-            ctx.fillStyle = "rgba(245,166,35,0.2)";
-            ctx.fill();
-
-            // Plane
+            // رسم الطائرة
             if(planeImg.complete) {
                 ctx.save();
                 ctx.translate(curX, curY);
-                ctx.rotate(-25 * Math.PI/180);
-                ctx.drawImage(planeImg, -20, -20, 40, 40);
+                ctx.rotate(-20 * Math.PI/180);
+                ctx.drawImage(planeImg, -25, -25, 50, 50);
                 ctx.restore();
             }
         }
@@ -658,85 +413,54 @@
             setTimeout(startCount, 3000);
         }
 
+        // دوال التحكم
         function action(id) {
             if(state === 'COUNT') {
                 if(!isBetPlaced) {
                     isBetPlaced = true;
-                    btn1.className = "btn-place-bet btn-red";
+                    btn1.className = "btn-action btn-red";
                     lbl1.innerText = "إلغاء";
-                    sub1.innerText = "انتظار الجولة";
+                    sub1.innerText = "انتظار";
                 } else {
                     isBetPlaced = false;
                     resetBtn();
                 }
-            } else if (state === 'FLY' && inRound) {
-                // Cashout
+            } else if(state === 'FLY' && inRound) {
+                // سحب الأرباح
                 inRound = false;
-                let finalW = (document.getElementById('bet1').value * mult).toFixed(2);
-                btn1.className = "btn-place-bet btn-green";
+                btn1.className = "btn-action btn-green";
                 lbl1.innerText = "فوز!";
-                sub1.innerText = finalW + " EGP";
                 btn1.disabled = true;
-                addWin(mult, finalW);
             } else {
-                // Next round
+                // وضع رهان للجولة القادمة
                 isBetPlaced = true;
-                lbl1.innerText = "تم الوضع";
+                lbl1.innerText = "تم";
                 sub1.innerText = "للجولة التالية";
             }
         }
 
         function resetBtn() {
-            btn1.className = "btn-place-bet";
+            btn1.className = "btn-action btn-orange";
             btn1.style.opacity = 1;
-            btn1.disabled = false;
             btn1.style.cursor = "pointer";
-            lbl1.innerText = "وضع الرهان";
-            sub1.innerText = "(على الجولة التالية)";
+            btn1.disabled = false;
+            lbl1.innerText = "رهان";
+            sub1.innerText = "التالية";
         }
 
         function adjBet(id, v) {
             let el = document.getElementById('bet'+id);
-            el.value = Math.max(10, parseInt(el.value)+v);
+            let val = parseInt(el.value) + v;
+            if(val < 10) val = 10;
+            el.value = val;
         }
         function setB(id, v) {
             document.getElementById('bet'+id).value = v;
         }
 
-        function generateFakeData() {
-            table.innerHTML = "";
-            for(let i=0; i<12; i++) {
-                let won = Math.random() > 0.5;
-                let b = (Math.random()*500 + 10).toFixed(0);
-                let m = won ? (Math.random()*3+1).toFixed(2) : '-';
-                let p = won ? (b*m).toFixed(2) : '-';
-                let cls = won ? 'win-row' : '';
-                let txt = won ? 'win-txt' : '';
-                
-                table.innerHTML += `
-                    <tr class="${cls}">
-                        <td style="text-align:right">user${Math.floor(Math.random()*900)}***</td>
-                        <td class="${txt}">${won ? m+'x' : '-'}</td>
-                        <td>${b}</td>
-                        <td class="${txt}">${p}</td>
-                    </tr>
-                `;
-            }
-        }
-
-        function addWin(m, p) {
-            let row = document.createElement('tr');
-            row.className = 'win-row';
-            row.innerHTML = `
-                <td style="text-align:right">You (ME)</td>
-                <td class="win-txt">${m.toFixed(2)}x</td>
-                <td>${document.getElementById('bet1').value}</td>
-                <td class="win-txt">${p}</td>
-            `;
-            table.insertBefore(row, table.firstChild);
-        }
-
+        // البدء
         startCount();
+
     </script>
 </body>
 </html>
