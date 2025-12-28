@@ -1,0 +1,12 @@
+[
+  {
+    "type": "image",
+    "src": "media/image1.jpg",
+    "caption": "صورة تجريبية"
+  },
+  {
+    "type": "video",
+    "src": "media/video1.mp4",
+    "caption": "فيديو تجريبي"
+  }
+]
