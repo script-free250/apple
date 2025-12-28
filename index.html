@@ -10,6 +10,8 @@
             --accent-green: #5da034;
             --accent-orange: #ff7f00;
             --accent-red: #e94848;
+            --bg-panel: rgba(0, 0, 0, 0.4);
+            --border-color: #2a3544;
         }
 
         * {
@@ -30,45 +32,34 @@
             align-items: center;
         }
 
-        /* الحاوية الرئيسية */
+        /* --- الخلفية --- */
         .game-container {
             position: relative;
             width: 100%;
             height: 100%;
         }
 
-        /* --- تعديل هام: الصورة كعنصر مستقل لضمان ظهورها --- */
         .background-img {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1; /* في الخلفية */
-            object-fit: fill; /* تمدد لتملأ الشاشة بالكامل */
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            object-fit: fill;
         }
 
-        /* --- 1. الطائرة (Canvas) --- */
+        /* --- منطقة الطائرة --- */
         .canvas-area {
             position: absolute;
-            /* ضبطنا الأبعاد لتناسب الصورة التي فرغتها */
-            top: 13%;      
-            left: 0;       
-            width: 73%;    
-            height: 55%;   
-            z-index: 10;   /* فوق الصورة */
+            top: 13%; left: 0;
+            width: 73%; height: 55%;
+            z-index: 10;
         }
 
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+        canvas { width: 100%; height: 100%; display: block; }
 
         .multiplier-text {
             position: absolute;
-            top: 40%;
-            left: 50%;
+            top: 40%; left: 50%;
             transform: translate(-50%, -50%);
             font-size: 5rem;
             font-weight: 700;
@@ -78,12 +69,11 @@
             z-index: 15;
         }
 
-        /* مؤقت الانتظار */
         .loader-overlay {
             position: absolute; inset: 0;
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
-            background: rgba(14, 22, 33, 0.4); 
+            background: rgba(14, 22, 33, 0.6); 
             z-index: 20;
         }
         .timer-big { font-size: 50px; font-weight: bold; color: #e94848; font-family: 'Roboto'; margin: 10px 0;}
@@ -91,36 +81,124 @@
         .prog-fill { height: 100%; background: #e94848; width: 0%; transition: width 0.1s; }
 
 
-        /* --- 2. أزرار التحكم (Controls) --- */
+        /* --- تنسيق الأزرار الجديدة (CSS الخاص بالكود الذي أرسلته) --- */
         .controls-overlay {
             position: absolute;
-            /* تم ضبط الأماكن بدقة بناء على الصورة المفرغة */
-            bottom: 2.5%;     
-            left: 21.5%;      
-            width: 32.5%;     
-            height: 23%;    
+            bottom: 2.5%; left: 21.5%;
+            width: 32.5%; height: 23%;
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            z-index: 20; /* فوق الصورة */
+            gap: 8px;
+            z-index: 20;
         }
 
-        .bet-row {
+        /* الحاوية الرئيسية لكل رهان */
+        .crash-bet__item {
+            display: flex;
+            flex-direction: row-reverse; /* لعكس الترتيب وجعل زر الرهان يساراً */
+            gap: 10px;
+            background: var(--bg-panel);
+            padding: 8px;
+            border-radius: 6px;
+            height: 50%; /* نصف المساحة لكل رهان */
+        }
+
+        /* عمود المدخلات (يمين) */
+        .inputs-column-wrapper {
             flex: 1;
             display: flex;
-            gap: 10px;
-            align-items: center;
-            /* خلفية شفافة جداً عشان لو مكان الزر مرحل شوية ميبانش غلط */
-            background: rgba(0, 0, 0, 0.2); 
-            border-radius: 4px;
-            padding: 5px 10px;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 4px;
         }
 
-        /* الزر البرتقالي الكبير */
-        .btn-action {
-            width: 100px;
-            height: 100%;
+        /* 1. صف أزرار التحكم (إدخال + أزرار سريعة) */
+        .crash-bet-control {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        /* حقل الإدخال */
+        .crash-bet-control__field {
+            position: relative;
+            display: flex;
+            height: 30px;
+            background: #0b1219;
+            border: 1px solid #2a3544;
             border-radius: 4px;
+        }
+        .crash-bet-control__input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Roboto';
+        }
+        .button-input-clear {
+            width: 25px;
+            background: transparent;
+            border: none;
+            color: #7f8b98;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .button-input-clear:hover { color: #fff; }
+
+        /* الأزرار السريعة (10, 50, 100...) */
+        .crash-bet-control__wrap {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 3px;
+        }
+        .crash-bet-control__btn {
+            background: #242f3e;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 3px;
+            font-size: 10px;
+            height: 22px;
+            cursor: pointer;
+            padding: 0;
+            font-family: 'Roboto';
+        }
+        .crash-bet-control__btn:hover { background: #333; }
+
+        /* 2. زر التشغيل التلقائي */
+        .crash-bet-btn--autobet {
+            background: transparent;
+            border: 1px solid #2a3544;
+            color: #aaa;
+            border-radius: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 10px;
+            width: fit-content;
+            margin-bottom: 2px;
+        }
+        .crash-bet-btn--autobet.active {
+            background: rgba(93, 160, 52, 0.2);
+            color: #fff;
+            border-color: var(--accent-green);
+        }
+        .crash-bet-btn__text--autobet::before {
+            content: '● ';
+            color: #555;
+        }
+        .crash-bet-btn--autobet.active .crash-bet-btn__text--autobet::before { color: var(--accent-green); }
+
+
+        /* 3. زر الرهان الكبير (يسار) */
+        .crash-bet-btn--play {
+            width: 100px;
+            border-radius: 6px;
             border: none;
             cursor: pointer;
             display: flex;
@@ -129,9 +207,12 @@
             justify-content: center;
             color: #fff;
             font-weight: bold;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
-            transition: 0.1s;
+            font-size: 16px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            transition: all 0.1s;
         }
+        
+        /* ألوان الزر */
         .btn-orange {
             background: linear-gradient(to bottom, #ff9e2a, #ff7f00);
             border: 1px solid #e67300;
@@ -147,56 +228,21 @@
             border: 1px solid #c0392b;
             box-shadow: 0 4px 0 #a93226;
         }
-        .btn-action:active { transform: translateY(2px); box-shadow: none; }
-
-        .inputs-group {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .input-wrapper {
-            display: flex;
-            height: 30px;
-            background: #0b1219;
-            border: 1px solid #333;
-            border-radius: 3px;
-        }
-        .qty-btn { width: 30px; background: transparent; border: none; color: #fff; cursor: pointer; font-size: 18px; }
-        .main-input { flex: 1; background: transparent; border: none; color: #fff; text-align: center; font-weight: bold; font-family: 'Roboto'; font-size: 16px; }
+        .crash-bet-btn--play:active { transform: translateY(2px); box-shadow: none; }
         
-        .quick-btns {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 3px;
-        }
-        .q-btn {
-            background: #242f3e; border: 1px solid #333; color: #ccc;
-            font-size: 10px; padding: 4px; border-radius: 2px; cursor: pointer;
-        }
-        .q-btn:hover { background: #333; color: #fff; }
-
-        .toggles-row {
-            display: flex; justify-content: space-between; font-size: 10px; color: #ccc; margin-bottom: 2px; font-weight: bold;
-        }
-        .toggle-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .toggle-track { width: 24px; height: 12px; background: #000; border-radius: 6px; position: relative; border: 1px solid #444;}
-        .toggle-dot { width: 8px; height: 8px; background: #666; border-radius: 50%; position: absolute; top: 1px; left: 2px; transition: 0.2s;}
-        .toggle-item.active .toggle-track { background: var(--accent-green); }
-        .toggle-item.active .toggle-dot { left: 12px; background: #fff; }
+        /* إخفاء أيقونات SVG المعقدة للحفاظ على البساطة */
+        .crash-bet-btn__icon { display: none !important; }
 
     </style>
 </head>
 <body>
 
     <div class="game-container">
-        <img src="bg-game.jpg" alt="تأكد من اسم الصورة bg-game.jpg" class="background-img">
+        <img src="bg-game.jpg" alt="Background" class="background-img">
         
         <div class="canvas-area">
             <canvas id="gameCanvas"></canvas>
             <div id="multiplier" class="multiplier-text">1.00x</div>
-            
             <div id="loader" class="loader-overlay">
                 <div style="color:#fff; font-weight:bold;">انتظار الجولة</div>
                 <div id="timer" class="timer-big">5.0</div>
@@ -206,58 +252,62 @@
 
         <div class="controls-overlay">
             
-            <div class="bet-row">
-                <button id="btn1" class="btn-action btn-orange" onclick="action(1)">
-                    <span style="font-size:14px" id="lbl1">رهان</span>
-                    <span style="font-size:9px; opacity:0.8" id="sub1">التالية</span>
+            <div class="crash-bet__item">
+                <button id="btn1" class="crash-bet-btn--play crash-bet__btn btn-orange" type="button" onclick="action(1)">
+                    <span class="crash-bet-btn__wrap">
+                        <span id="lbl1" class="crash-bet-btn__text crash-bet-btn__text--play">وضع الرهان</span>
+                        <div id="sub1" style="font-size:10px; opacity:0.8; margin-top:2px;">(التالية)</div>
+                    </span>
                 </button>
-                <div class="inputs-group">
-                    <div class="toggles-row">
-                        <div class="toggle-item" onclick="this.classList.toggle('active')">
-                            <div class="toggle-track"><div class="toggle-dot"></div></div> تلقائي
+
+                <div class="inputs-column-wrapper">
+                    <button class="crash-bet-btn--is-autobet-disabled crash-bet-btn crash-bet-btn--autobet crash-bet__btn" onclick="this.classList.toggle('active')" type="button">
+                        <span class="crash-bet-btn__text crash-bet-btn__text--autobet">تشغيل تلقائي</span>
+                    </button>
+
+                    <div class="crash-bet-control crash-bet__control">
+                        <div class="crash-bet-control__field">
+                            <input id="bet1" class="crash-bet-control__input bet-input" type="number" value="10">
+                            <button class="button-input-clear" onclick="clearInput(1)">✕</button>
                         </div>
-                        <div class="toggle-item">
-                            <div class="toggle-track"><div class="toggle-dot"></div></div> سحب
+                        <div class="crash-bet-control__wrap">
+                            <button class="crash-bet-control__btn" onclick="setB(1, 10)">10</button>
+                            <button class="crash-bet-control__btn" onclick="setB(1, 50)">50</button>
+                            <button class="crash-bet-control__btn" onclick="setB(1, 100)">100</button>
+                            <button class="crash-bet-control__btn" onclick="setB(1, 400)">400</button>
+                            <button class="crash-bet-control__btn" onclick="setB(1, 1000)">1k</button>
+                            <button class="crash-bet-control__btn" onclick="setB(1, 5000)">5k</button>
                         </div>
-                    </div>
-                    <div class="input-wrapper">
-                        <button class="qty-btn" onclick="adjBet(1, -5)">-</button>
-                        <input id="bet1" type="number" class="main-input" value="10">
-                        <button class="qty-btn" onclick="adjBet(1, 5)">+</button>
-                    </div>
-                    <div class="quick-btns">
-                        <button class="q-btn" onclick="setB(1, 10)">10</button>
-                        <button class="q-btn" onclick="setB(1, 50)">50</button>
-                        <button class="q-btn" onclick="setB(1, 100)">100</button>
-                        <button class="q-btn" onclick="setB(1, 500)">500</button>
                     </div>
                 </div>
             </div>
 
-            <div class="bet-row">
-                <button id="btn2" class="btn-action btn-orange" style="opacity:0.7; cursor:default;">
-                    <span style="font-size:14px">رهان</span>
-                    <span style="font-size:9px; opacity:0.8">التالية</span>
+            <div class="crash-bet__item">
+                <button id="btn2" class="crash-bet-btn--play crash-bet__btn btn-orange" type="button" style="opacity:0.7; cursor: default;">
+                    <span class="crash-bet-btn__wrap">
+                        <span class="crash-bet-btn__text crash-bet-btn__text--play">وضع الرهان</span>
+                        <div style="font-size:10px; opacity:0.8; margin-top:2px;">(التالية)</div>
+                    </span>
                 </button>
-                <div class="inputs-group">
-                    <div class="toggles-row">
-                        <div class="toggle-item">
-                            <div class="toggle-track"><div class="toggle-dot"></div></div> تلقائي
+
+                <div class="inputs-column-wrapper">
+                    <button class="crash-bet-btn--is-autobet-disabled crash-bet-btn crash-bet-btn--autobet crash-bet__btn" onclick="this.classList.toggle('active')" type="button">
+                        <span class="crash-bet-btn__text crash-bet-btn__text--autobet">تشغيل تلقائي</span>
+                    </button>
+
+                    <div class="crash-bet-control crash-bet__control">
+                        <div class="crash-bet-control__field">
+                            <input id="bet2" class="crash-bet-control__input bet-input" type="number" value="20">
+                            <button class="button-input-clear" onclick="clearInput(2)">✕</button>
                         </div>
-                        <div class="toggle-item">
-                            <div class="toggle-track"><div class="toggle-dot"></div></div> سحب
+                        <div class="crash-bet-control__wrap">
+                            <button class="crash-bet-control__btn" onclick="setB(2, 10)">10</button>
+                            <button class="crash-bet-control__btn" onclick="setB(2, 50)">50</button>
+                            <button class="crash-bet-control__btn" onclick="setB(2, 100)">100</button>
+                            <button class="crash-bet-control__btn" onclick="setB(2, 400)">400</button>
+                            <button class="crash-bet-control__btn" onclick="setB(2, 1000)">1k</button>
+                            <button class="crash-bet-control__btn" onclick="setB(2, 5000)">5k</button>
                         </div>
-                    </div>
-                    <div class="input-wrapper">
-                        <button class="qty-btn" onclick="adjBet(2, -5)">-</button>
-                        <input id="bet2" type="number" class="main-input" value="20">
-                        <button class="qty-btn" onclick="adjBet(2, 5)">+</button>
-                    </div>
-                    <div class="quick-btns">
-                        <button class="q-btn" onclick="setB(2, 10)">10</button>
-                        <button class="q-btn" onclick="setB(2, 50)">50</button>
-                        <button class="q-btn" onclick="setB(2, 100)">100</button>
-                        <button class="q-btn" onclick="setB(2, 500)">500</button>
                     </div>
                 </div>
             </div>
@@ -273,16 +323,16 @@
         const timerEl = document.getElementById('timer');
         const progEl = document.getElementById('progress');
         
-        // Buttons
+        // Buttons UI references
         const btn1 = document.getElementById('btn1');
         const lbl1 = document.getElementById('lbl1');
         const sub1 = document.getElementById('sub1');
 
-        // صورة الطائرة
+        // Plane Image
         const planeImg = new Image();
         planeImg.src = 'https://cdn-icons-png.flaticon.com/512/2213/2213075.png'; 
 
-        // المتغيرات
+        // Game State Variables
         let state = 'IDLE';
         let mult = 1.00;
         let t = 0;
@@ -291,6 +341,7 @@
         let isBetPlaced = false;
         let inRound = false;
 
+        // Resize Canvas
         function resize() {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
@@ -298,13 +349,14 @@
         window.addEventListener('resize', resize);
         setTimeout(resize, 100);
 
+        // --- Game Logic ---
         function startCount() {
             state = 'COUNT';
             loader.style.display = 'flex';
             multEl.style.display = 'none';
 
             if(isBetPlaced) {
-                btn1.className = "btn-action btn-red";
+                btn1.className = "crash-bet-btn--play crash-bet__btn btn-red";
                 lbl1.innerText = "إلغاء";
                 sub1.innerText = "انتظار";
             } else {
@@ -336,7 +388,7 @@
             if(isBetPlaced) {
                 inRound = true;
                 isBetPlaced = false;
-                btn1.className = "btn-action btn-green";
+                btn1.className = "crash-bet-btn--play crash-bet__btn btn-green";
                 lbl1.innerText = "سحب";
                 sub1.innerText = document.getElementById('bet1').value + " EGP";
             } else {
@@ -351,13 +403,17 @@
 
         function loop() {
             if(state !== 'FLY') return;
+
             t += 0.015;
             mult = 1.0 + (t*t*0.1);
             multEl.innerText = mult.toFixed(2) + "x";
+
             if(inRound) {
                 sub1.innerText = (document.getElementById('bet1').value * mult).toFixed(2);
             }
+
             draw();
+
             if(mult >= crashPoint) crash();
             else requestAnimationFrame(loop);
         }
@@ -401,11 +457,12 @@
             setTimeout(startCount, 3000);
         }
 
+        // --- Button Actions ---
         function action(id) {
             if(state === 'COUNT') {
                 if(!isBetPlaced) {
                     isBetPlaced = true;
-                    btn1.className = "btn-action btn-red";
+                    btn1.className = "crash-bet-btn--play crash-bet__btn btn-red";
                     lbl1.innerText = "إلغاء";
                     sub1.innerText = "انتظار";
                 } else {
@@ -413,11 +470,13 @@
                     resetBtn();
                 }
             } else if(state === 'FLY' && inRound) {
+                // Cashout
                 inRound = false;
-                btn1.className = "btn-action btn-green";
+                btn1.className = "crash-bet-btn--play crash-bet__btn btn-green";
                 lbl1.innerText = "فوز!";
                 btn1.disabled = true;
             } else {
+                // Place Bet for Next Round
                 isBetPlaced = true;
                 lbl1.innerText = "تم";
                 sub1.innerText = "للجولة التالية";
@@ -425,22 +484,20 @@
         }
 
         function resetBtn() {
-            btn1.className = "btn-action btn-orange";
+            btn1.className = "crash-bet-btn--play crash-bet__btn btn-orange";
             btn1.style.opacity = 1;
             btn1.style.cursor = "pointer";
             btn1.disabled = false;
-            lbl1.innerText = "رهان";
-            sub1.innerText = "التالية";
+            lbl1.innerText = "وضع الرهان";
+            sub1.innerText = "(التالية)";
         }
 
-        function adjBet(id, v) {
-            let el = document.getElementById('bet'+id);
-            let val = parseInt(el.value) + v;
-            if(val < 10) val = 10;
-            el.value = val;
-        }
         function setB(id, v) {
             document.getElementById('bet'+id).value = v;
+        }
+
+        function clearInput(id) {
+            document.getElementById('bet'+id).value = '';
         }
 
         startCount();
