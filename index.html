@@ -30,28 +30,33 @@
             align-items: center;
         }
 
-        /* الحاوية الرئيسية التي ستحمل الصورة كخلفية */
+        /* الحاوية الرئيسية */
         .game-container {
             position: relative;
             width: 100%;
             height: 100%;
-            /* هنا نضع الصورة كخلفية */
-            background-image: url('image_d29779.jpg'); 
-            background-size: 100% 100%; /* تمدد الصورة لتملأ الشاشة */
-            background-repeat: no-repeat;
-            background-position: center;
+        }
+
+        /* --- تعديل هام: الصورة كعنصر مستقل لضمان ظهورها --- */
+        .background-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* في الخلفية */
+            object-fit: fill; /* تمدد لتملأ الشاشة بالكامل */
         }
 
         /* --- 1. الطائرة (Canvas) --- */
-        /* نجعلها فوق منطقة الرسم فقط */
         .canvas-area {
             position: absolute;
-            top: 13%;      /* مسافة من الأعلى لتفادي الهيدر */
-            left: 0;       /* تبدأ من اليسار */
-            width: 73%;    /* العرض تقريباً ليتوقف قبل القائمة الجانبية اليمنى */
-            height: 55%;   /* الارتفاع ليتوقف قبل منطقة الأزرار والسجل */
-            z-index: 10;   /* لضمان ظهور الطائرة فوق الخلفية */
-            /* border: 1px solid red;  احذف هذا السطر، هو فقط للتجربة لتعرف الحدود */
+            /* ضبطنا الأبعاد لتناسب الصورة التي فرغتها */
+            top: 13%;      
+            left: 0;       
+            width: 73%;    
+            height: 55%;   
+            z-index: 10;   /* فوق الصورة */
         }
 
         canvas {
@@ -78,7 +83,7 @@
             position: absolute; inset: 0;
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
-            background: rgba(14, 22, 33, 0.4); /* شفافية بسيطة */
+            background: rgba(14, 22, 33, 0.4); 
             z-index: 20;
         }
         .timer-big { font-size: 50px; font-weight: bold; color: #e94848; font-family: 'Roboto'; margin: 10px 0;}
@@ -87,30 +92,28 @@
 
 
         /* --- 2. أزرار التحكم (Controls) --- */
-        /* هذه المنطقة ستوضع في الفراغ الذي مسحته أسفل اليسار */
         .controls-overlay {
             position: absolute;
-            bottom: 2.5%;     /* مسافة من الأسفل */
-            left: 21%;      /* مسافة من اليسار (بعد الشريط الجانبي الصغير) */
-            width: 33%;     /* عرض المنطقة المخصصة للأزرار */
-            height: 23%;    /* ارتفاع المنطقة */
+            /* تم ضبط الأماكن بدقة بناء على الصورة المفرغة */
+            bottom: 2.5%;     
+            left: 21.5%;      
+            width: 32.5%;     
+            height: 23%;    
             display: flex;
             flex-direction: column;
             gap: 5px;
-            z-index: 20;
-            /* background: rgba(0, 255, 0, 0.1);  للتجربة: لون أخضر شفاف لضبط المكان */
+            z-index: 20; /* فوق الصورة */
         }
 
-        /* تصميم كارت الرهان الواحد */
         .bet-row {
             flex: 1;
             display: flex;
             gap: 10px;
             align-items: center;
-            background: rgba(27, 36, 45, 0.95); /* خلفية شبه شفافة لتغطي أي بقايا */
+            /* خلفية شفافة جداً عشان لو مكان الزر مرحل شوية ميبانش غلط */
+            background: rgba(0, 0, 0, 0.2); 
             border-radius: 4px;
             padding: 5px 10px;
-            border: 1px solid #2a3544;
         }
 
         /* الزر البرتقالي الكبير */
@@ -146,7 +149,6 @@
         }
         .btn-action:active { transform: translateY(2px); box-shadow: none; }
 
-        /* منطقة الإدخال */
         .inputs-group {
             flex: 1;
             display: flex;
@@ -175,21 +177,21 @@
         }
         .q-btn:hover { background: #333; color: #fff; }
 
-        /* سويتشات التشغيل التلقائي */
         .toggles-row {
-            display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 2px;
+            display: flex; justify-content: space-between; font-size: 10px; color: #ccc; margin-bottom: 2px; font-weight: bold;
         }
         .toggle-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-        .toggle-track { width: 20px; height: 10px; background: #000; border-radius: 5px; position: relative; }
-        .toggle-dot { width: 8px; height: 8px; background: #555; border-radius: 50%; position: absolute; top: 1px; left: 1px; transition: 0.2s;}
+        .toggle-track { width: 24px; height: 12px; background: #000; border-radius: 6px; position: relative; border: 1px solid #444;}
+        .toggle-dot { width: 8px; height: 8px; background: #666; border-radius: 50%; position: absolute; top: 1px; left: 2px; transition: 0.2s;}
         .toggle-item.active .toggle-track { background: var(--accent-green); }
-        .toggle-item.active .toggle-dot { left: 11px; background: #fff; }
+        .toggle-item.active .toggle-dot { left: 12px; background: #fff; }
 
     </style>
 </head>
 <body>
 
     <div class="game-container">
+        <img src="bg-game.jpg" alt="تأكد من اسم الصورة bg-game.jpg" class="background-img">
         
         <div class="canvas-area">
             <canvas id="gameCanvas"></canvas>
@@ -261,7 +263,6 @@
             </div>
 
         </div>
-
     </div>
 
     <script>
@@ -290,13 +291,11 @@
         let isBetPlaced = false;
         let inRound = false;
 
-        // ضبط حجم الكانفاس ليناسب الحاوية
         function resize() {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
         }
         window.addEventListener('resize', resize);
-        // استدعاء أولي بعد تحميل الصفحة بقليل لضمان الأبعاد
         setTimeout(resize, 100);
 
         function startCount() {
@@ -304,7 +303,6 @@
             loader.style.display = 'flex';
             multEl.style.display = 'none';
 
-            // حالة الزر
             if(isBetPlaced) {
                 btn1.className = "btn-action btn-red";
                 lbl1.innerText = "إلغاء";
@@ -353,39 +351,30 @@
 
         function loop() {
             if(state !== 'FLY') return;
-
             t += 0.015;
             mult = 1.0 + (t*t*0.1);
             multEl.innerText = mult.toFixed(2) + "x";
-
             if(inRound) {
                 sub1.innerText = (document.getElementById('bet1').value * mult).toFixed(2);
             }
-
             draw();
-
             if(mult >= crashPoint) crash();
             else requestAnimationFrame(loop);
         }
 
         function draw() {
-            // مسح الكانفاس بالكامل ليبقى شفافاً
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             const w = canvas.width;
             const h = canvas.height;
 
-            // حساب مسار الطائرة
             let progress = Math.min(t / 6, 1);
-            let sx = 0, sy = h; // نقطة البداية (أسفل اليسار)
-            let ex = w * 0.9, ey = h * 0.1; // نقطة النهاية (أعلى اليمين)
-            let cpx = w * 0.5, cpy = h; // نقطة التحكم للانحناء
+            let sx = 0, sy = h; 
+            let ex = w * 0.9, ey = h * 0.1; 
+            let cpx = w * 0.5, cpy = h; 
 
-            // معادلة بيزير
             let curX = (1-progress)*(1-progress)*sx + 2*(1-progress)*progress*cpx + progress*progress*ex;
             let curY = (1-progress)*(1-progress)*sy + 2*(1-progress)*progress*cpy + progress*progress*ey;
 
-            // رسم الخط فقط (بدون تعبئة خلفية لكي تظهر الجبال الأصلية)
             ctx.beginPath();
             ctx.moveTo(sx, sy);
             ctx.quadraticCurveTo(sx + (cpx-sx)*progress, sy + (cpy-sy)*progress, curX, curY);
@@ -396,7 +385,6 @@
             ctx.shadowBlur = 15;
             ctx.stroke();
 
-            // رسم الطائرة
             if(planeImg.complete) {
                 ctx.save();
                 ctx.translate(curX, curY);
@@ -413,7 +401,6 @@
             setTimeout(startCount, 3000);
         }
 
-        // دوال التحكم
         function action(id) {
             if(state === 'COUNT') {
                 if(!isBetPlaced) {
@@ -426,13 +413,11 @@
                     resetBtn();
                 }
             } else if(state === 'FLY' && inRound) {
-                // سحب الأرباح
                 inRound = false;
                 btn1.className = "btn-action btn-green";
                 lbl1.innerText = "فوز!";
                 btn1.disabled = true;
             } else {
-                // وضع رهان للجولة القادمة
                 isBetPlaced = true;
                 lbl1.innerText = "تم";
                 sub1.innerText = "للجولة التالية";
@@ -458,9 +443,7 @@
             document.getElementById('bet'+id).value = v;
         }
 
-        // البدء
         startCount();
-
     </script>
 </body>
 </html>
