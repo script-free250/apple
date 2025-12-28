@@ -4,26 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MelBet Crash Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
         :root {
-            --bg-dark: #0f1923;
-            --bg-panel: #1b242d;
-            --bg-card: #242f3e;
-            --yellow-accent: #f5a623;
-            --green-accent: #5da034;
-            --red-accent: #e94848;
+            --bg-main: #0e1621; /* الخلفية الرئيسية */
+            --bg-panel: #1b242d; /* خلفية اللوحات */
+            --bg-header: #f5a623; /* الأصفر العلوي */
+            --header-dark: #1a1a1a;
+            --accent-green: #5da034;
+            --accent-red: #e94848; /* رأس القائمة الجانبية */
+            --accent-orange: #ff7f00; /* زر الرهان */
             --text-white: #ffffff;
-            --text-gray: #9aa8b9;
+            --text-gray: #7f8b98;
+            --border-color: #2a3544;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            font-family: 'Roboto Condensed', sans-serif;
         }
 
         body {
+            background-color: var(--bg-main);
+            color: var(--text-white);
             margin: 0;
             padding: 0;
-            background-color: var(--bg-dark);
-            color: var(--text-white);
-            font-family: 'Roboto', sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -31,75 +37,61 @@
         }
 
         /* --- Header --- */
-        .header {
-            height: 60px;
-            background-color: #111;
+        header {
+            height: 80px;
             display: flex;
             flex-direction: column;
         }
-        .header-top {
-            height: 30px;
-            background-color: var(--yellow-accent);
+        .top-nav {
+            height: 40px;
+            background-color: var(--header-dark);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+        .main-nav {
+            height: 40px;
+            background-color: var(--bg-header);
             display: flex;
             align-items: center;
             padding: 0 20px;
             color: #000;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 14px;
-            justify-content: space-between;
-        }
-        .header-nav {
-            height: 30px;
-            background-color: #222;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
             gap: 20px;
-            font-size: 12px;
         }
+        .logo-area { font-weight: 900; font-size: 18px; display:flex; align-items:center; gap:5px;}
 
-        /* --- Main Layout --- */
-        .main-wrapper {
+        /* --- Layout --- */
+        .container {
             display: flex;
-            flex: 1;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 80px);
         }
 
-        /* --- Left Side: Game + Controls --- */
+        /* --- Left Side (Game) --- */
         .game-section {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 10px;
-            gap: 10px;
-            position: relative;
+            padding: 5px;
+            gap: 5px;
         }
 
-        /* Game Monitor (Canvas) */
-        .monitor-container {
-            flex: 2; /* يأخذ مساحة أكبر */
-            background-color: #161f2c;
-            border-radius: 5px;
+        /* Graph Area */
+        .game-window {
+            flex: 1;
+            background-color: var(--bg-panel);
+            border-radius: 4px;
             position: relative;
             overflow: hidden;
-            border: 1px solid #333;
-            /* خلفية تحاكي الجبال */
-            background-image: linear-gradient(to top, #161f2c 0%, #1e2c3b 100%);
+            border: 1px solid var(--border-color);
+            background-image: url('https://v3.traincdn.com/genfiles/cms/8-62/desktop/media_asset/9e0426ed8a0566bbf907b5b9c01f777c.png'); /* خلفية نجوم خفيفة افتراضية */
+            background-blend-mode: overlay;
         }
 
-        /* Mountains Silhouette Effect */
-        .mountains-bg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 30%;
-            background: url('https://i.imgur.com/JjOcaqH.png') repeat-x bottom; /* صورة تقريبية للجبال */
-            background-size: contain;
-            opacity: 0.3;
-            z-index: 0;
-        }
-
+        /* Canvas */
         canvas {
             position: absolute;
             top: 0;
@@ -109,343 +101,306 @@
             z-index: 1;
         }
 
-        /* Multiplier Text in Center */
-        .multiplier-display {
+        .bg-gradient {
             position: absolute;
-            top: 50%;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 100%, #2c3e50 0%, #0e1621 70%);
+            z-index: 0;
+        }
+
+        /* Multiplier Text */
+        .multiplier-stat {
+            position: absolute;
+            top: 45%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 5rem;
-            font-weight: 900;
+            font-weight: 700;
             color: #fff;
             z-index: 10;
             text-shadow: 0 0 20px rgba(0,0,0,0.5);
-            font-variant-numeric: tabular-nums;
         }
-        .crashed { color: var(--red-accent) !important; }
 
-        /* --- Betting Controls (Bottom) --- */
-        .controls-container {
-            height: 180px; /* ارتفاع ثابت للوحة التحكم */
+        /* Betting Controls Area */
+        .controls-wrapper {
+            height: 170px;
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
 
+        /* Individual Bet Panel */
         .bet-panel {
             flex: 1;
-            background-color: var(--bg-card);
-            border-radius: 5px;
-            padding: 10px;
+            background-color: var(--bg-panel);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            padding: 8px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid #333;
         }
 
-        .panel-header {
+        .panel-options {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-gray);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
-        .toggle-switch {
+        /* Checkbox slider style */
+        .toggle-btn {
             display: flex;
             align-items: center;
-            gap: 5px;
+            font-size: 11px;
+            color: var(--text-gray);
             cursor: pointer;
+            gap: 5px;
         }
-        .switch-bg {
-            width: 30px;
-            height: 16px;
-            background: #111;
-            border-radius: 10px;
-            position: relative;
+        .toggle-track {
+            width: 30px; height: 16px; background: #0b1219; border-radius: 8px; position: relative;
+            border: 1px solid #333;
         }
-        .switch-bg::after {
-            content: '';
-            position: absolute;
-            left: 2px; top: 2px;
-            width: 12px; height: 12px;
-            background: #666;
-            border-radius: 50%;
-            transition: 0.2s;
+        .toggle-knob {
+            width: 12px; height: 12px; background: #666; border-radius: 50%; 
+            position: absolute; top: 1px; left: 2px; transition: 0.2s;
         }
-        .toggle-switch.active .switch-bg { background: var(--green-accent); }
-        .toggle-switch.active .switch-bg::after { left: 16px; background: #fff; }
+        .toggle-btn.active .toggle-track { background: var(--accent-green); border-color: var(--accent-green); }
+        .toggle-btn.active .toggle-knob { left: 14px; background: #fff; }
 
-        /* Inputs Row */
-        .bet-row {
+        /* Betting Inputs Layout */
+        .bet-interface {
             display: flex;
-            gap: 10px;
             height: 100%;
+            gap: 8px;
         }
 
-        .bet-input-col {
+        .input-column {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
 
-        .input-wrapper {
-            background: #0b1219;
+        /* Number Input Box */
+        .bet-input-box {
+            display: flex;
+            background-color: #0b1219;
             border: 1px solid #333;
             border-radius: 4px;
-            display: flex;
+            height: 40px;
             align-items: center;
-            height: 45px;
             padding: 0 5px;
         }
-        .input-btn {
-            width: 30px;
-            height: 30px;
-            background: transparent;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
+        .qty-btn {
+            width: 24px; height: 24px;
+            border: 1px solid #333; background: transparent; color: #fff;
+            border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
         }
-        .bet-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
+        .main-input {
+            flex: 1; background: transparent; border: none; color: #fff; 
+            text-align: center; font-size: 16px; font-weight: bold;
         }
 
-        .quick-amounts {
+        /* Quick Buttons Grid */
+        .quick-buttons {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns like image */
+            gap: 4px;
         }
-        .quick-btn {
-            background: #1b242d;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
+        .q-btn {
+            background: #242f3e; border: 1px solid #333; color: #fff;
+            padding: 6px; font-size: 11px; border-radius: 3px; cursor: pointer;
         }
-        .quick-btn:hover { background: #333; }
+        .q-btn:hover { background: #333; }
 
-        /* Big Orange Button */
-        .place-bet-btn {
-            width: 140px;
-            background: linear-gradient(to bottom, #ffb84d, #f5a623);
+        /* The Big Action Button */
+        .action-button {
+            width: 130px;
+            border-radius: 4px;
             border: none;
-            border-radius: 5px;
-            color: #fff;
-            font-weight: bold;
-            font-size: 18px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #bf7c0e;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+            transition: 0.1s;
         }
-        .place-bet-btn span { font-size: 10px; font-weight: normal; margin-top: 5px; opacity: 0.9; }
-        .place-bet-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bf7c0e; }
+        .btn-orange {
+            background: linear-gradient(to bottom, #ff9e2a, #ff7f00);
+            border: 1px solid #e67300;
+            box-shadow: 0 4px 0 #cc6600;
+        }
+        .btn-orange:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc6600; }
         
-        .cashout-style {
-            background: linear-gradient(to bottom, #75c949, #5da034) !important;
-            box-shadow: 0 4px 0 #3d701f !important;
+        .btn-green {
+            background: linear-gradient(to bottom, #7acc46, #5da034);
+            border: 1px solid #4d862b;
+            box-shadow: 0 4px 0 #3e6b22;
         }
+
+        .btn-label { font-size: 18px; font-weight: 700; color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+        .btn-sub { font-size: 10px; color: rgba(255,255,255,0.8); margin-top: 2px; }
 
         /* --- Right Sidebar --- */
         .sidebar {
-            width: 350px;
+            width: 320px;
             background-color: var(--bg-panel);
-            border-right: 1px solid #333;
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
         }
 
         .sidebar-header {
-            background: var(--red-accent);
-            color: #fff;
+            background: linear-gradient(to right, #e94848, #ff6b6b);
+            color: white;
             padding: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: bold;
-            font-size: 13px;
-            border-top-left-radius: 8px; /* خدعة بصرية */
-            margin: 5px;
-            border-radius: 5px;
-        }
-
-        .bets-table {
-            width: 100%;
-            border-collapse: collapse;
             font-size: 12px;
-        }
-        .bets-table th {
-            color: var(--text-gray);
-            padding: 8px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-            font-weight: normal;
-        }
-        .bets-table td {
-            padding: 6px 8px;
-            border-bottom: 1px solid #2a3544;
-            color: #fff;
-            text-align: center;
-        }
-        .col-user { display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
-        .col-user img { width: 20px; height: 20px; border-radius: 50%; background: #555; }
-        
-        .mult-pill {
-            background: rgba(255,255,255,0.1);
-            padding: 2px 8px;
-            border-radius: 10px;
             font-weight: bold;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            margin: 5px;
         }
-        .mult-win { color: var(--green-accent); background: rgba(93, 160, 52, 0.2); }
 
-        /* Loader Overlay */
+        .bets-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { color: var(--text-gray); font-weight: normal; padding: 5px; text-align: center; border-bottom: 1px solid #333; }
+        td { color: #fff; padding: 4px 8px; border-bottom: 1px solid #25303d; text-align: center; }
+        .user-cell { text-align: right; display: flex; align-items: center; gap: 5px; justify-content: flex-end;}
+        .user-icon { width: 18px; height: 18px; border-radius: 50%; background: #444; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0e1621; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        /* Loader */
         .loader-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 25, 35, 0.9);
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            position: absolute; inset: 0; background: rgba(14, 22, 33, 0.9);
+            z-index: 20; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .progress-bar-bg {
-            width: 200px;
-            height: 4px;
-            background: #333;
-            margin-top: 10px;
-            border-radius: 2px;
-        }
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--red-accent);
-            width: 100%;
-            transition: width 0.1s linear;
-        }
+        .progress-container { width: 150px; height: 4px; background: #333; margin-top: 10px; border-radius: 2px; }
+        .progress-bar { height: 100%; background: #e94848; width: 0%; transition: width 0.1s linear; }
 
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="header-top">
-            <div>MELBET <span style="font-size:10px; opacity:0.8;">SIMULATOR</span></div>
-            <div>EGP 14,500.00</div>
+    <header>
+        <div class="top-nav">
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span style="color:#aaa;">07:47 / AR</span>
+                <span>⚙️</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button style="background:#f5a623; border:none; padding:5px 15px; border-radius:3px; font-weight:bold;">التسجيل</button>
+                <button style="background:#333; color:#fff; border:none; padding:5px 15px; border-radius:3px;">تسجيل الدخول</button>
+            </div>
         </div>
-        <div class="header-nav">
-            <span>الرياضات</span>
-            <span>بث مباشر</span>
-            <span style="color:var(--yellow-accent)">FAST GAMES</span>
-            <span>كازينو</span>
+        <div class="main-nav">
+            <div style="flex:1;">Fruit Cocktail 🍸</div>
+            <div class="logo-area">
+                <span style="color:white;">MEL</span><span style="color:#000;">BET</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_Egypt.svg" width="20">
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="main-wrapper">
+    <div class="container">
         <div class="game-section">
-            
-            <div class="monitor-container">
-                <div class="mountains-bg"></div>
+            <div class="game-window">
+                <div class="bg-gradient"></div>
+                <div style="position:absolute; bottom:0; width:100%; height:150px; background: url('https://i.imgur.com/JjOcaqH.png') repeat-x bottom; opacity:0.2; background-size:contain;"></div>
                 
                 <canvas id="gameCanvas"></canvas>
-                
-                <div id="multiplierDisplay" class="multiplier-display">1.00x</div>
+                <div id="multiplier" class="multiplier-stat">1.00x</div>
 
-                <div id="loadingOverlay" class="loader-overlay">
-                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">جاري انتظار الجولة</div>
-                    <div style="font-size: 40px; color: var(--red-accent);" id="countdownText">7</div>
-                    <div class="progress-bar-bg"><div id="progressFill" class="progress-bar-fill"></div></div>
+                <div id="loader" class="loader-overlay">
+                    <div style="font-size:20px; font-weight:bold; margin-bottom:5px;">جاري انتظار الجولة</div>
+                    <div style="color:#e94848; font-size:30px;" id="timer">5</div>
+                    <div class="progress-container"><div id="progress" class="progress-bar"></div></div>
                 </div>
             </div>
 
-            <div class="controls-container">
-                
+            <div class="controls-wrapper">
                 <div class="bet-panel">
-                    <div class="panel-header">
-                        <div class="toggle-switch">
-                            <div class="switch-bg"></div>
-                            <span>الرهان التلقائي</span>
+                    <div class="panel-options">
+                        <div class="toggle-btn" onclick="this.classList.toggle('active')">
+                            <div class="toggle-track"><div class="toggle-knob"></div></div>
+                            تمكين الرهان التلقائي
                         </div>
-                        <div class="toggle-switch">
-                            <div class="switch-bg"></div>
-                            <span>سحب تلقائي</span>
+                        <div class="toggle-btn" onclick="this.classList.toggle('active')">
+                            <div class="toggle-track"><div class="toggle-knob"></div></div>
+                            سحب تلقائي
                         </div>
                     </div>
-                    <div class="bet-row">
-                        <div class="bet-input-col">
-                            <div class="input-wrapper">
-                                <button class="input-btn" onclick="updateBet(1, -5)">-</button>
-                                <input type="number" id="betInput1" class="bet-input" value="10">
-                                <button class="input-btn" onclick="updateBet(1, 5)">+</button>
+                    <div class="bet-interface">
+                        <div class="input-column">
+                            <div class="bet-input-box">
+                                <button class="qty-btn" onclick="adjBet(1, -5)">-</button>
+                                <input id="bet1" type="number" class="main-input" value="10">
+                                <button class="qty-btn" onclick="adjBet(1, 5)">+</button>
                             </div>
-                            <div class="quick-amounts">
-                                <button class="quick-btn" onclick="setBet(1, 10)">10</button>
-                                <button class="quick-btn" onclick="setBet(1, 50)">50</button>
-                                <button class="quick-btn" onclick="setBet(1, 100)">100</button>
-                                <button class="quick-btn" onclick="setBet(1, 500)">500</button>
+                            <div class="quick-buttons">
+                                <button class="q-btn" onclick="setB(1, 10)">10</button>
+                                <button class="q-btn" onclick="setB(1, 50)">50</button>
+                                <button class="q-btn" onclick="setB(1, 100)">100</button>
+                                <button class="q-btn" onclick="setB(1, 500)">500</button>
                             </div>
                         </div>
-                        <button id="btn1" class="place-bet-btn" onclick="placeBet(1)">
-                            <div id="btnText1" style="font-size:16px;">وضع الرهان</div>
-                            <span id="btnSub1">على الجولة التالية</span>
+                        <button id="btn1" class="action-button btn-orange" onclick="action(1)">
+                            <div class="btn-label" id="lbl1">وضع الرهان</div>
+                            <div class="btn-sub" id="sub1">(على الجولة التالية)</div>
                         </button>
                     </div>
                 </div>
 
                 <div class="bet-panel">
-                    <div class="panel-header">
-                        <div class="toggle-switch">
-                            <div class="switch-bg"></div>
-                            <span>الرهان التلقائي</span>
+                    <div class="panel-options">
+                        <div class="toggle-btn">
+                            <div class="toggle-track"><div class="toggle-knob"></div></div>
+                            تمكين الرهان التلقائي
                         </div>
-                        <div class="toggle-switch">
-                            <div class="switch-bg"></div>
-                            <span>سحب تلقائي</span>
+                        <div class="toggle-btn">
+                            <div class="toggle-track"><div class="toggle-knob"></div></div>
+                            سحب تلقائي
                         </div>
                     </div>
-                    <div class="bet-row">
-                        <div class="bet-input-col">
-                            <div class="input-wrapper">
-                                <button class="input-btn" onclick="updateBet(2, -5)">-</button>
-                                <input type="number" id="betInput2" class="bet-input" value="20">
-                                <button class="input-btn" onclick="updateBet(2, 5)">+</button>
+                    <div class="bet-interface">
+                        <div class="input-column">
+                            <div class="bet-input-box">
+                                <button class="qty-btn" onclick="adjBet(2, -5)">-</button>
+                                <input id="bet2" type="number" class="main-input" value="20">
+                                <button class="qty-btn" onclick="adjBet(2, 5)">+</button>
                             </div>
-                            <div class="quick-amounts">
-                                <button class="quick-btn" onclick="setBet(2, 10)">10</button>
-                                <button class="quick-btn" onclick="setBet(2, 50)">50</button>
-                                <button class="quick-btn" onclick="setBet(2, 100)">100</button>
-                                <button class="quick-btn" onclick="setBet(2, 500)">500</button>
+                            <div class="quick-buttons">
+                                <button class="q-btn" onclick="setB(2, 10)">10</button>
+                                <button class="q-btn" onclick="setB(2, 50)">50</button>
+                                <button class="q-btn" onclick="setB(2, 100)">100</button>
+                                <button class="q-btn" onclick="setB(2, 500)">500</button>
                             </div>
                         </div>
-                        <button class="place-bet-btn" style="opacity: 0.8; cursor: not-allowed;">
-                            <div>وضع الرهان</div>
-                            <span>على الجولة التالية</span>
+                        <button id="btn2" class="action-button btn-orange" style="opacity:0.8; cursor:default;">
+                            <div class="btn-label">وضع الرهان</div>
+                            <div class="btn-sub">(على الجولة التالية)</div>
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
 
         <div class="sidebar">
             <div class="sidebar-header">
-                <span>عدد الرهانات: 842</span>
-                <span>EGP 45200.50</span>
+                <span>عدد الرهانات: <span id="totalBets">0</span></span>
+                <span>EGP <span id="totalMoney">0.00</span></span>
             </div>
-            <div style="flex:1; overflow-y:auto;">
-                <table class="bets-table">
+            <div class="bets-list">
+                <table>
                     <thead>
                         <tr>
                             <th style="text-align:right">اسم المستخدم</th>
@@ -454,7 +409,7 @@
                             <th>الأرباح</th>
                         </tr>
                     </thead>
-                    <tbody id="betsBody">
+                    <tbody id="betsTable">
                         </tbody>
                 </table>
             </div>
@@ -464,318 +419,270 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const multDisplay = document.getElementById('multiplierDisplay');
-        const loader = document.getElementById('loadingOverlay');
-        const countText = document.getElementById('countdownText');
-        const progFill = document.getElementById('progressFill');
+        const multEl = document.getElementById('multiplier');
+        const loader = document.getElementById('loader');
+        const timerEl = document.getElementById('timer');
+        const progressEl = document.getElementById('progress');
         const btn1 = document.getElementById('btn1');
-        const btnText1 = document.getElementById('btnText1');
-        const btnSub1 = document.getElementById('btnSub1');
-        const betsBody = document.getElementById('betsBody');
+        const lbl1 = document.getElementById('lbl1');
+        const sub1 = document.getElementById('sub1');
+        const table = document.getElementById('betsTable');
 
         // Images
         const planeImg = new Image();
-        // صورة الطائرة الصفراء (MelBet Style)
-        planeImg.src = 'https://cdn-icons-png.flaticon.com/512/7893/7893979.png'; 
+        // رابط صورة طائرة صفراء كرتونية
+        planeImg.src = 'https://cdn-icons-png.flaticon.com/512/2213/2213075.png';
 
         // State
-        let state = 'IDLE'; // IDLE, COUNTDOWN, FLYING, CRASHED
-        let multiplier = 1.00;
-        let crashAt = 0;
-        let time = 0;
-        let animationId;
-        let myBet = 0;
-        let isBetting = false; // Player clicked bet for next round
-        let inGame = false; // Player is currently flying
-        
-        // Resize
-        function resize(){
+        let state = 'IDLE'; 
+        let mult = 1.00;
+        let crashPoint = 0;
+        let t = 0;
+        let animId;
+        let isBetPlaced = false;
+        let inRound = false;
+
+        function resize() {
             canvas.width = canvas.parentElement.offsetWidth;
             canvas.height = canvas.parentElement.offsetHeight;
         }
         window.addEventListener('resize', resize);
         resize();
 
-        // --- Logic ---
-
         function startCountdown() {
             state = 'COUNTDOWN';
             loader.style.display = 'flex';
-            multDisplay.style.display = 'none';
-            multDisplay.classList.remove('crashed');
-            
-            // Generate Random Fake Bets
-            generateFakeBets();
+            multEl.style.display = 'none';
+            generateFakeData(); // Fill sidebar with fake bets
 
-            let timeLeft = 7;
-            countText.innerText = timeLeft;
-            progFill.style.width = '100%';
-
-            // Update button if bet placed
-            if (isBetting) {
-                btn1.style.background = '#e94848'; // Red for cancel/waiting
-                btn1.style.boxShadow = '0 4px 0 #a02020';
-                btnText1.innerText = "إلغاء الرهان";
-                btnSub1.innerText = "انتظار البدء...";
+            if(isBetPlaced) {
+                btn1.style.background = '#e94848'; // Red cancel
+                btn1.style.borderColor = '#c0392b';
+                btn1.style.boxShadow = '0 4px 0 #a93226';
+                lbl1.innerText = "إلغاء";
+                sub1.innerText = "انتظار الجولة";
             } else {
-                resetBtn();
+                resetButton();
             }
 
-            const interval = setInterval(() => {
-                timeLeft--;
-                countText.innerText = timeLeft;
-                progFill.style.width = (timeLeft/7)*100 + '%';
-                
-                if(timeLeft <= 0) {
-                    clearInterval(interval);
+            let seconds = 5;
+            timerEl.innerText = seconds;
+            progressEl.style.width = '0%';
+
+            const intv = setInterval(() => {
+                seconds--;
+                timerEl.innerText = seconds;
+                progressEl.style.width = ((5-seconds)/5)*100 + '%';
+                if(seconds <= 0) {
+                    clearInterval(intv);
                     loader.style.display = 'none';
-                    startGame();
+                    startFlight();
                 }
             }, 1000);
         }
 
-        function startGame() {
+        function startFlight() {
             state = 'FLYING';
-            multDisplay.style.display = 'block';
-            multDisplay.style.color = '#fff';
-            multDisplay.innerText = '1.00x';
+            multEl.style.display = 'block';
+            multEl.style.color = '#fff';
+            multEl.innerText = '1.00x';
             
-            multiplier = 1.00;
-            time = 0;
-            // Crash Logic: 
-            crashAt = (Math.random() * 5) + 1.1; 
-            if(Math.random() > 0.9) crashAt = 10 + Math.random() * 20; // 10% chance for big win
+            t = 0;
+            mult = 1.00;
+            crashPoint = (Math.random() * 3) + 1.1; 
+            if(Math.random() > 0.8) crashPoint = Math.random() * 10;
 
-            if (isBetting) {
-                inGame = true;
-                isBetting = false;
-                // Change Button to Cashout
-                btn1.className = "place-bet-btn cashout-style";
-                btnText1.innerText = "سحب الأرباح";
-                btnSub1.innerText = (document.getElementById('betInput1').value * 1).toFixed(2) + ' EGP';
+            if(isBetPlaced) {
+                inRound = true;
+                isBetPlaced = false; // Consumed
+                btn1.className = "action-button btn-green";
+                lbl1.innerText = "سحب";
+                sub1.innerText = document.getElementById('bet1').value + ' EGP';
             } else {
-                btn1.style.background = '#e94848';
-                btn1.style.boxShadow = 'none';
-                btn1.style.opacity = '0.7';
-                btnText1.innerText = "انتظر";
-                btnSub1.innerText = "الجولة جارية";
-                btn1.disabled = true;
+                btn1.style.opacity = 0.5;
+                lbl1.innerText = "انتظر";
+                sub1.innerText = "";
             }
 
             loop();
         }
 
         function loop() {
-            if (state !== 'FLYING') return;
+            if(state !== 'FLYING') return;
 
-            time += 0.016; // approx 60fps
-            // Exponential growth formula approximation
-            multiplier = 1.0 + (Math.pow(time, 2) * 0.05);
+            t += 0.016;
+            mult = 1.0 + (t*t * 0.08); // Exponential curve
+            multEl.innerText = mult.toFixed(2) + 'x';
 
-            multDisplay.innerText = multiplier.toFixed(2) + 'x';
-
-            // Check if player in game to update cashout value
-            if (inGame) {
-                let currentWin = (document.getElementById('betInput1').value * multiplier);
-                btnSub1.innerText = currentWin.toFixed(2) + ' EGP';
+            if(inRound) {
+                let win = (document.getElementById('bet1').value * mult).toFixed(2);
+                sub1.innerText = win + " EGP";
             }
 
             draw();
 
-            if (multiplier >= crashAt) {
+            if(mult >= crashPoint) {
                 crash();
             } else {
-                animationId = requestAnimationFrame(loop);
+                animId = requestAnimationFrame(loop);
             }
         }
 
         function draw() {
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-            
+            ctx.clearRect(0,0,canvas.width, canvas.height);
             const w = canvas.width;
             const h = canvas.height;
 
-            // Draw Grid Lines (optional for tech look)
+            // Draw grid (optional details)
             ctx.strokeStyle = 'rgba(255,255,255,0.05)';
             ctx.beginPath();
-            for(let i=0; i<w; i+=100) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
-            for(let j=0; j<h; j+=100) { ctx.moveTo(0,j); ctx.lineTo(w,j); }
+            for(let i=0; i<w; i+=80) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
+            for(let j=0; j<h; j+=80) { ctx.moveTo(0,j); ctx.lineTo(w,j); }
             ctx.stroke();
 
-            // Calculate Plane Position
-            // Curve starts at bottom left (0, h)
-            // Ends somewhat top right-ish based on time
-            
-            let progress = Math.min(time / 8, 1); // Cap animation path
-            
-            let startX = 0; 
+            // Plane Math
+            let progress = Math.min(t / 6, 1);
+            let startX = 0;
             let startY = h;
+            let endX = w * 0.85;
+            let endY = h * 0.2;
             
-            // Bezier Control Points
+            // Bezier points
             let cpX = w * 0.5;
             let cpY = h;
-            
-            let endX = w * 0.8; 
-            let endY = h * 0.2; // Go up to 20% from top
 
-            // Quadratic Bezier Formula
-            let t = progress;
-            let invT = 1 - t;
-            
-            let x = (invT * invT * startX) + (2 * invT * t * cpX) + (t * t * endX);
-            let y = (invT * invT * startY) + (2 * invT * t * cpY) + (t * t * endY);
+            // Current Point
+            let curX = (1-progress)*(1-progress)*startX + 2*(1-progress)*progress*cpX + progress*progress*endX;
+            let curY = (1-progress)*(1-progress)*startY + 2*(1-progress)*progress*cpY + progress*progress*endY;
 
-            // Draw Curve Trail
+            // Draw Trail
             ctx.beginPath();
             ctx.moveTo(startX, startY);
-            ctx.quadraticCurveTo(startX + (cpX - startX) * (t/1), startY, x, y);
-            
+            ctx.quadraticCurveTo(
+                startX + (cpX-startX)*progress, 
+                startY + (cpY-startY)*progress,
+                curX, curY
+            );
             ctx.strokeStyle = '#f5a623';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#f5a623';
             ctx.stroke();
-            ctx.shadowBlur = 0; // Reset
 
-            // Fill area under curve
-            ctx.lineTo(x, h);
-            ctx.lineTo(0, h);
-            ctx.fillStyle = 'rgba(245, 166, 35, 0.1)';
+            // Fill Area
+            ctx.lineTo(curX, h);
+            ctx.lineTo(startX, h);
+            ctx.fillStyle = 'rgba(245, 166, 35, 0.2)';
             ctx.fill();
 
             // Draw Plane
-            if (planeImg.complete) {
+            if(planeImg.complete) {
                 ctx.save();
-                ctx.translate(x, y);
-                // Calculate Rotation
-                // Derivative of quadratic bezier for angle is roughly linear here for visual
-                let angle = -20 - (t * 40); // Start -20 deg, go to -60 deg
+                ctx.translate(curX, curY);
+                let angle = -20 - (progress * 25);
                 ctx.rotate(angle * Math.PI / 180);
-                
-                // Draw Plane
-                let pSize = 60;
-                ctx.drawImage(planeImg, -pSize/2, -pSize/2, pSize, pSize);
-                
-                // Engine flame/glow
-                ctx.beginPath();
-                ctx.arc(-25, 5, 5, 0, Math.PI*2);
-                ctx.fillStyle = '#fff';
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#fff';
-                ctx.fill();
-                
+                ctx.drawImage(planeImg, -25, -25, 50, 50);
                 ctx.restore();
             }
         }
 
         function crash() {
             state = 'CRASHED';
-            cancelAnimationFrame(animationId);
+            cancelAnimationFrame(animId);
+            multEl.style.color = '#e94848'; // Red text
+            multEl.innerHTML = "CRASHED<br>" + mult.toFixed(2) + "x";
             
-            multDisplay.innerText = 'CRASHED\n' + multiplier.toFixed(2) + 'x';
-            multDisplay.classList.add('crashed');
+            inRound = false;
             
-            if (inGame) {
-                // Lost
-                btn1.style.background = '#e94848';
-                btn1.className = "place-bet-btn"; // Reset style
-                btnText1.innerText = "خسارة";
-                btnSub1.innerText = "-" + document.getElementById('betInput1').value;
-            }
-            inGame = false;
-            
-            // Wait then restart
-            setTimeout(startCountdown, 3000);
+            // Reset Button after crash
+            setTimeout(() => {
+                startCountdown();
+            }, 3000);
         }
 
-        // --- Interaction ---
-        function updateBet(panel, val) {
-            const input = document.getElementById('betInput'+panel);
-            let v = parseInt(input.value) + val;
+        // Logic
+        function adjBet(id, val) {
+            let el = document.getElementById('bet'+id);
+            let v = parseInt(el.value) + val;
             if(v < 1) v = 1;
-            input.value = v;
+            el.value = v;
         }
-        function setBet(panel, val) {
-            document.getElementById('betInput'+panel).value = val;
+        function setB(id, val) {
+            document.getElementById('bet'+id).value = val;
         }
 
-        function placeBet(panel) {
-            if (panel !== 1) return; // Only panel 1 working for demo
-
-            if (state === 'COUNTDOWN') {
-                if (!isBetting) {
-                    isBetting = true;
-                    // Update UI in loop
+        function action(id) {
+            if(state === 'COUNTDOWN') {
+                if(!isBetPlaced) {
+                    isBetPlaced = true;
+                    btn1.style.background = '#e94848';
+                    btn1.style.borderColor = '#c0392b';
+                    btn1.style.boxShadow = '0 4px 0 #a93226';
+                    lbl1.innerText = "إلغاء";
+                    sub1.innerText = "بانتظار الجولة";
                 } else {
-                    isBetting = false; // Cancel
-                    resetBtn();
+                    isBetPlaced = false;
+                    resetButton();
                 }
-            } else if (state === 'FLYING' && inGame) {
+            } else if (state === 'FLYING' && inRound) {
                 // Cashout
-                inGame = false;
-                let win = (document.getElementById('betInput1').value * multiplier).toFixed(2);
-                
-                btn1.style.background = '#5da034';
-                btn1.style.boxShadow = 'none';
-                btnText1.innerText = "فوز!";
-                btnSub1.innerText = win + " EGP";
+                inRound = false;
+                btn1.className = "action-button btn-green";
+                lbl1.innerText = "فوز!";
                 btn1.disabled = true;
-                
-                // Add to sidebar history
-                addHistoryRow(multiplier, win);
+                addWinToSidebar(mult, document.getElementById('bet1').value * mult);
             } else {
-                // Clicking during crash or while idle, set for next round
-                isBetting = true;
-                btnText1.innerText = "تم الوضع";
-                btnSub1.innerText = "للجولة التالية";
+                isBetPlaced = true;
+                lbl1.innerText = "تم الوضع";
+                sub1.innerText = "للجولة التالية";
             }
         }
 
-        function resetBtn() {
-            btn1.className = "place-bet-btn";
-            btn1.style.background = ""; // Reset gradient
-            btn1.style.boxShadow = "";
-            btn1.style.opacity = "1";
+        function resetButton() {
+            btn1.className = "action-button btn-orange";
+            btn1.style.opacity = 1;
             btn1.disabled = false;
-            btnText1.innerText = "وضع الرهان";
-            btnSub1.innerText = "على الجولة التالية";
+            lbl1.innerText = "وضع الرهان";
+            sub1.innerText = "(على الجولة التالية)";
+            btn1.style.background = ""; // Clear manual styles
+            btn1.style.boxShadow = "";
+            btn1.style.borderColor = "";
         }
 
-        // --- Sidebar Fake Data ---
-        function generateFakeBets() {
-            betsBody.innerHTML = '';
+        // Fake Sidebar Data
+        function generateFakeData() {
+            table.innerHTML = '';
+            let total = 0;
+            let count = Math.floor(Math.random() * 500) + 100;
+            document.getElementById('totalBets').innerText = count;
+
             for(let i=0; i<15; i++) {
-                let row = document.createElement('tr');
-                let user = Math.floor(Math.random()*900000) + '***';
-                let bet = (Math.random() * 500 + 10).toFixed(2);
-                row.innerHTML = `
-                    <td class="col-user">
-                        ${user} <img src="https://cdn-icons-png.flaticon.com/128/3135/3135715.png">
-                    </td>
-                    <td>-</td>
-                    <td>${bet}</td>
-                    <td>-</td>
+                let bet = (Math.random() * 1000 + 10).toFixed(2);
+                total += parseFloat(bet);
+                let row = `
+                    <tr>
+                        <td class="user-cell">${Math.floor(Math.random()*90000)}*** <div class="user-icon"></div></td>
+                        <td>-</td>
+                        <td>EGP ${bet}</td>
+                        <td>-</td>
+                    </tr>
                 `;
-                betsBody.appendChild(row);
+                table.innerHTML += row;
             }
+            document.getElementById('totalMoney').innerText = total.toFixed(2);
         }
 
-        function addHistoryRow(mult, win) {
-            // Add user win to top of list
+        function addWinToSidebar(m, w) {
             let row = document.createElement('tr');
-            row.style.background = "rgba(93, 160, 52, 0.2)";
-            row.style.borderLeft = "3px solid #5da034";
+            row.style.background = 'rgba(93, 160, 52, 0.2)';
             row.innerHTML = `
-                <td class="col-user">أنت <img src="https://cdn-icons-png.flaticon.com/128/3135/3135715.png"></td>
-                <td><span class="mult-pill mult-win">${mult.toFixed(2)}x</span></td>
-                <td>${document.getElementById('betInput1').value}</td>
-                <td style="color:#5da034; font-weight:bold;">${win}</td>
+                <td class="user-cell">أنت <div class="user-icon" style="background:#5da034"></div></td>
+                <td style="color:#5da034; font-weight:bold;">${m.toFixed(2)}x</td>
+                <td>EGP ${document.getElementById('bet1').value}</td>
+                <td style="color:#5da034; font-weight:bold;">${w.toFixed(2)}</td>
             `;
-            betsBody.insertBefore(row, betsBody.firstChild);
+            table.insertBefore(row, table.firstChild);
         }
 
-        // Start
         startCountdown();
 
     </script>
